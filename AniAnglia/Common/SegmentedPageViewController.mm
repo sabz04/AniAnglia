@@ -1,208 +1,272 @@
 //
-//  SegmentedPageViewController.m
-//  AniAnglia
+//  SegmentedPageViewController.mm
 //
-//  Created by Toilettrauma on 11.04.2025.
+//  Scrolling tab bar paired with a swipeable page controller.
+//  Inspired by Apple News / App Store: text labels with an animated
+//  underline that tracks the active page.
+//
+//  Public API is unchanged: -setPageViewControllers:, -setSegmentTitles:.
 //
 
-#import <Foundation/Foundation.h>
 #import "SegmentedPageViewController.h"
 #import "AppColor.h"
 
-@interface NoSwipeSegmentedControl : UISegmentedControl
+static CGFloat const kTabBarHeight  = 44;
+static CGFloat const kTabPaddingX   = 16;     // padding around each tab label
+static CGFloat const kUnderlineH    = 2;
 
-@end
-
-@interface SegmentedPageViewController () <UIPageViewControllerDataSource, UIPageViewControllerDelegate, UIGestureRecognizerDelegate>
-@property(nonatomic, retain) UIScrollView* segments_scroll_view;
-@property(nonatomic, retain) UISegmentedControl* segmented_control;
+@interface SegmentedPageViewController () <UIPageViewControllerDataSource, UIPageViewControllerDelegate>
+@property(nonatomic, retain) UIScrollView*      tab_scroll_view;
+@property(nonatomic, retain) UIView*            tab_content_view;
+@property(nonatomic, retain) UIView*            underline_view;
+@property(nonatomic, retain) UIView*            tab_separator;
 @property(nonatomic, retain) UIPageViewController* page_view_controller;
-@property(nonatomic, retain) UIGestureRecognizer* page_pan_gesture_recognizer;
+@property(nonatomic, retain) NSMutableArray<UIButton*>* tab_buttons;
 @property(nonatomic, retain) NSArray<UIViewController*>* page_view_controllers;
-@property(nonatomic, retain) NSArray<NSString*>* segment_titles;
-@property(nonatomic) NSInteger current_page_index;
-@property(nonatomic) BOOL is_changing_page;
-
-@end
-
-@implementation NoSwipeSegmentedControl
-
--(BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer*)gesture_recognizer {
-    if([gesture_recognizer isKindOfClass:UITapGestureRecognizer.class]) {
-        return NO;
-    } else {
-        return YES;
-    }
-}
-
+@property(nonatomic, retain) NSArray<NSString*>*         segment_titles;
+@property(nonatomic) NSInteger current_index;
+@property(nonatomic, retain) NSLayoutConstraint* underline_leading;
+@property(nonatomic, retain) NSLayoutConstraint* underline_width;
 @end
 
 @implementation SegmentedPageViewController
 
--(void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    _segmented_control.userInteractionEnabled = YES;
-}
-
 -(void)viewDidLoad {
     [super viewDidLoad];
-    
-    [self setup];
-    [self setupLayout];
+    self.view.backgroundColor = [AppColorProvider backgroundColor];
+    _tab_buttons = [NSMutableArray array];
+    [self setupViews];
+    [self rebuildTabs];
+    [self initialPagePresentation];
 }
 
--(void)setup {
-    _segments_scroll_view = [UIScrollView new];
-    _segments_scroll_view.showsHorizontalScrollIndicator = NO;
-    _segments_scroll_view.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
-    
-    if (_segment_titles) {
-        _segmented_control = [[NoSwipeSegmentedControl alloc] initWithItems:_segment_titles];
-    } else {
-        _segmented_control = [NoSwipeSegmentedControl new];
-    }
-    _segmented_control.selectedSegmentIndex = 0;
-    [_segmented_control addTarget:self action:@selector(onPagesSegmentChanged:) forControlEvents:UIControlEventValueChanged];
-    
-    _page_view_controller = [[UIPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal options:nil];
+#pragma mark - Setup
+
+-(void)setupViews {
+    _tab_scroll_view = [UIScrollView new];
+    _tab_scroll_view.showsHorizontalScrollIndicator = NO;
+    _tab_scroll_view.alwaysBounceHorizontal = NO;
+    _tab_scroll_view.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+
+    _tab_content_view = [UIView new];
+    [_tab_scroll_view addSubview:_tab_content_view];
+
+    _underline_view = [UIView new];
+    _underline_view.backgroundColor = [AppColorProvider primaryColor];
+    _underline_view.layer.cornerRadius = kUnderlineH / 2.0;
+    [_tab_content_view addSubview:_underline_view];
+
+    _tab_separator = [UIView new];
+    _tab_separator.backgroundColor = [AppColorProvider separatorColor];
+
+    _page_view_controller = [[UIPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll
+                                                            navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal
+                                                                          options:nil];
     _page_view_controller.dataSource = self;
-    _page_view_controller.delegate = self;
-    if (_page_view_controllers) {
-        [_page_view_controller setViewControllers:@[_page_view_controllers[0]] direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:nil];
-    }
+    _page_view_controller.delegate   = self;
     [self addChildViewController:_page_view_controller];
-    
-    [self.view addSubview:_segments_scroll_view];
-    [_segments_scroll_view addSubview:_segmented_control];
+    [_page_view_controller didMoveToParentViewController:self];
+
+    [self.view addSubview:_tab_scroll_view];
+    [self.view addSubview:_tab_separator];
     [self.view addSubview:_page_view_controller.view];
 
-    _segments_scroll_view.translatesAutoresizingMaskIntoConstraints = NO;
-    _segmented_control.translatesAutoresizingMaskIntoConstraints = NO;
+    _tab_scroll_view.translatesAutoresizingMaskIntoConstraints = NO;
+    _tab_content_view.translatesAutoresizingMaskIntoConstraints = NO;
+    _underline_view.translatesAutoresizingMaskIntoConstraints = NO;
+    _tab_separator.translatesAutoresizingMaskIntoConstraints = NO;
     _page_view_controller.view.translatesAutoresizingMaskIntoConstraints = NO;
+
+    UILayoutGuide* safe = self.view.safeAreaLayoutGuide;
     [NSLayoutConstraint activateConstraints:@[
-        [_segments_scroll_view.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor],
-        [_segments_scroll_view.leadingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leadingAnchor],
-        [_segments_scroll_view.widthAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.widthAnchor],
-        [_segments_scroll_view.heightAnchor constraintEqualToConstant:40],
-        
-        [_segmented_control.topAnchor constraintEqualToAnchor:_segments_scroll_view.topAnchor],
-        [_segmented_control.leadingAnchor constraintEqualToAnchor:_segments_scroll_view.leadingAnchor],
-        [_segmented_control.trailingAnchor constraintEqualToAnchor:_segments_scroll_view.trailingAnchor],
-        [_segmented_control.widthAnchor constraintGreaterThanOrEqualToAnchor:self.view.safeAreaLayoutGuide.widthAnchor],
-        [_segmented_control.heightAnchor constraintEqualToAnchor:_segments_scroll_view.heightAnchor],
-        
-        [_page_view_controller.view.topAnchor constraintEqualToAnchor:_segments_scroll_view.bottomAnchor constant:8],
-        [_page_view_controller.view.topAnchor constraintGreaterThanOrEqualToAnchor:self.view.topAnchor],
-        [_page_view_controller.view.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
-        [_page_view_controller.view.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-        [_page_view_controller.view.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor]
+        [_tab_scroll_view.topAnchor      constraintEqualToAnchor:safe.topAnchor],
+        [_tab_scroll_view.leadingAnchor  constraintEqualToAnchor:self.view.leadingAnchor],
+        [_tab_scroll_view.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+        [_tab_scroll_view.heightAnchor   constraintEqualToConstant:kTabBarHeight],
+
+        [_tab_content_view.topAnchor      constraintEqualToAnchor:_tab_scroll_view.topAnchor],
+        [_tab_content_view.bottomAnchor   constraintEqualToAnchor:_tab_scroll_view.bottomAnchor],
+        [_tab_content_view.leadingAnchor  constraintEqualToAnchor:_tab_scroll_view.contentLayoutGuide.leadingAnchor],
+        [_tab_content_view.trailingAnchor constraintEqualToAnchor:_tab_scroll_view.contentLayoutGuide.trailingAnchor],
+        [_tab_content_view.heightAnchor   constraintEqualToAnchor:_tab_scroll_view.heightAnchor],
+        // Tabs prefer not to scroll if everything fits on screen.
+        [_tab_content_view.widthAnchor    constraintGreaterThanOrEqualToAnchor:_tab_scroll_view.frameLayoutGuide.widthAnchor],
+
+        [_underline_view.bottomAnchor    constraintEqualToAnchor:_tab_content_view.bottomAnchor],
+        [_underline_view.heightAnchor    constraintEqualToConstant:kUnderlineH],
+
+        [_tab_separator.topAnchor        constraintEqualToAnchor:_tab_scroll_view.bottomAnchor],
+        [_tab_separator.leadingAnchor    constraintEqualToAnchor:self.view.leadingAnchor],
+        [_tab_separator.trailingAnchor   constraintEqualToAnchor:self.view.trailingAnchor],
+        [_tab_separator.heightAnchor     constraintEqualToConstant:1.0 / UIScreen.mainScreen.scale],
+
+        [_page_view_controller.view.topAnchor      constraintEqualToAnchor:_tab_separator.bottomAnchor],
+        [_page_view_controller.view.leadingAnchor  constraintEqualToAnchor:self.view.leadingAnchor],
+        [_page_view_controller.view.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+        [_page_view_controller.view.bottomAnchor   constraintEqualToAnchor:self.view.bottomAnchor]
     ]];
-    
-    [_page_view_controller didMoveToParentViewController:self];
-    
-    _page_pan_gesture_recognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(onPageViewControllerPanGesture:)];
-    _page_pan_gesture_recognizer.delegate = self;
-    [_page_view_controller.view addGestureRecognizer:_page_pan_gesture_recognizer];
+
+    _underline_leading = [_underline_view.leadingAnchor constraintEqualToAnchor:_tab_content_view.leadingAnchor constant:kTabPaddingX];
+    _underline_width   = [_underline_view.widthAnchor   constraintEqualToConstant:0];
+    [NSLayoutConstraint activateConstraints:@[_underline_leading, _underline_width]];
 }
--(void)setupLayout {
-    self.view.backgroundColor = [AppColorProvider backgroundColor];
-}
+
+#pragma mark - Public
 
 -(void)setPageViewControllers:(NSArray<UIViewController*>*)page_view_controllers {
     _page_view_controllers = page_view_controllers;
-    if (!_page_view_controller) return;
-    
-    if ([_page_view_controllers count] > 0) {
-        [_page_view_controller setViewControllers:@[_page_view_controllers[0]] direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:nil];
-    } else {
-        [_page_view_controller setViewControllers:@[] direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:nil];
-    }
-    _page_view_controller.dataSource = nil;
-    _page_view_controller.dataSource = self;
+    _current_index = 0;
+    [self initialPagePresentation];
 }
+
 -(void)setSegmentTitles:(NSArray<NSString*>*)segment_titles {
     _segment_titles = segment_titles;
-    if (!_segmented_control) return;
-    
-    [_segmented_control removeAllSegments];
-    NSInteger index = 0;
-    for (NSString* title : segment_titles) {
-        [_segmented_control insertSegmentWithTitle:title atIndex:index++ animated:NO];
-    }
-    [_segmented_control setSelectedSegmentIndex:0];
+    [self rebuildTabs];
 }
 
--(IBAction)onPagesSegmentChanged:(UISegmentedControl*)sender {
-    [self goToPageAtIndex:_segmented_control.selectedSegmentIndex];
+#pragma mark - Tabs
+
+-(void)rebuildTabs {
+    for (UIButton* b in _tab_buttons) [b removeFromSuperview];
+    [_tab_buttons removeAllObjects];
+    if (_segment_titles.count == 0 || !_tab_content_view) return;
+
+    UIButton* previous = nil;
+    for (NSInteger i = 0; i < (NSInteger)_segment_titles.count; ++i) {
+        NSString* title = _segment_titles[i];
+
+        UIButton* button = [UIButton buttonWithType:UIButtonTypeSystem];
+        button.tag = i;
+        button.titleLabel.font = [UIFont app_fontForStyle:AppTextStyleSubheadline weight:UIFontWeightMedium];
+        button.titleLabel.adjustsFontForContentSizeCategory = YES;
+        [button setTitle:title forState:UIControlStateNormal];
+        [button setTitleColor:[AppColorProvider textSecondaryColor] forState:UIControlStateNormal];
+        [button addTarget:self action:@selector(onTabButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+        button.contentEdgeInsets = UIEdgeInsetsMake(0, kTabPaddingX, 0, kTabPaddingX);
+
+        [_tab_content_view addSubview:button];
+        button.translatesAutoresizingMaskIntoConstraints = NO;
+        [NSLayoutConstraint activateConstraints:@[
+            [button.topAnchor    constraintEqualToAnchor:_tab_content_view.topAnchor],
+            [button.bottomAnchor constraintEqualToAnchor:_tab_content_view.bottomAnchor],
+        ]];
+        if (previous == nil) {
+            [button.leadingAnchor constraintEqualToAnchor:_tab_content_view.leadingAnchor].active = YES;
+        } else {
+            [button.leadingAnchor constraintEqualToAnchor:previous.trailingAnchor].active = YES;
+        }
+        [_tab_buttons addObject:button];
+        previous = button;
+    }
+    if (previous) {
+        [previous.trailingAnchor constraintEqualToAnchor:_tab_content_view.trailingAnchor].active = YES;
+    }
+
+    // First-pass selection visuals + underline placement after layout.
+    [self.view setNeedsLayout];
+    [self.view layoutIfNeeded];
+    [self updateSelectionAtIndex:_current_index animated:NO];
 }
 
--(void)willTransitionToPageAtIndex:(NSInteger)index {
-    _segmented_control.userInteractionEnabled = NO;
+-(void)initialPagePresentation {
+    if (_page_view_controllers.count == 0 || !_page_view_controller) return;
+    NSInteger idx = MIN(_current_index, (NSInteger)_page_view_controllers.count - 1);
+    [_page_view_controller setViewControllers:@[_page_view_controllers[idx]]
+                                    direction:UIPageViewControllerNavigationDirectionForward
+                                     animated:NO
+                                   completion:nil];
+    _current_index = idx;
+    [self updateSelectionAtIndex:idx animated:NO];
 }
 
--(void)didTransitionToPageAtIndex:(NSInteger)index completed:(BOOL)completed {
-    _segmented_control.userInteractionEnabled = YES;
-    if (_segmented_control.selectedSegmentIndex == index || !completed) {
-        return;
-    }
-    _segmented_control.selectedSegmentIndex = index;
-    
-    CGFloat segment_width = _segmented_control.frame.size.width / _segmented_control.numberOfSegments;
-    CGFloat scroll_view_width = _segments_scroll_view.frame.size.width;
-    CGFloat to_scroll_x = MAX(segment_width * (index + 0.5) - scroll_view_width / 2, 0);
-    CGFloat max_to_scroll_x = _segmented_control.frame.size.width - scroll_view_width;
-    [_segments_scroll_view setContentOffset:CGPointMake(MIN(to_scroll_x, max_to_scroll_x), 0) animated:YES];
+-(void)onTabButtonTapped:(UIButton*)sender {
+    NSInteger to = sender.tag;
+    if (to == _current_index || to >= (NSInteger)_page_view_controllers.count) return;
+
+    UIPageViewControllerNavigationDirection dir = to > _current_index
+        ? UIPageViewControllerNavigationDirectionForward
+        : UIPageViewControllerNavigationDirectionReverse;
+    NSInteger from = _current_index;
+    _current_index = to;
+    [self updateSelectionAtIndex:to animated:YES];
+
+    __weak __typeof__(self) weak_self = self;
+    [_page_view_controller setViewControllers:@[_page_view_controllers[to]]
+                                    direction:dir
+                                     animated:YES
+                                   completion:^(BOOL finished) {
+        // Rebuild data source so UIPageViewController recomputes neighbours
+        // around the new position (matches the previous behaviour).
+        __typeof__(self) strong_self = weak_self;
+        if (!strong_self) return;
+        strong_self.page_view_controller.dataSource = nil;
+        strong_self.page_view_controller.dataSource = strong_self;
+        (void)from;
+    }];
 }
 
--(UIViewController*)pageViewController:(UIPageViewController*)page_view_controller
-    viewControllerBeforeViewController:(UIViewController*)view_controller {
-    NSInteger index = [_page_view_controllers indexOfObject:view_controller];
-    if (index == NSNotFound || index <= 0) {
-        return nil;
+// Selected = primary color label + visible underline; others = secondary text.
+-(void)updateSelectionAtIndex:(NSInteger)index animated:(BOOL)animated {
+    if (index < 0 || index >= (NSInteger)_tab_buttons.count) return;
+
+    for (NSInteger i = 0; i < (NSInteger)_tab_buttons.count; ++i) {
+        UIButton* b = _tab_buttons[i];
+        BOOL selected = (i == index);
+        [b setTitleColor:selected ? [AppColorProvider primaryColor] : [AppColorProvider textSecondaryColor]
+                forState:UIControlStateNormal];
+        b.titleLabel.font = [UIFont app_fontForStyle:AppTextStyleSubheadline
+                                              weight:selected ? UIFontWeightSemibold : UIFontWeightMedium];
     }
-    return _page_view_controllers[index - 1];
+
+    UIButton* target = _tab_buttons[index];
+    // Underline tracks the visible title width — exclude padding for a tight feel.
+    CGSize title_size = [target.titleLabel intrinsicContentSize];
+    CGFloat width = MAX(20, title_size.width);
+    CGFloat x = CGRectGetMinX(target.frame) + (CGRectGetWidth(target.frame) - width) / 2.0;
+
+    _underline_leading.constant = x;
+    _underline_width.constant   = width;
+
+    void(^apply)(void) = ^{
+        [self.tab_content_view layoutIfNeeded];
+    };
+    if (animated) {
+        [UIView animateWithDuration:AppDurationFast delay:0 options:UIViewAnimationOptionCurveEaseOut animations:apply completion:nil];
+    } else {
+        apply();
+    }
+
+    // Keep the active tab visible inside the horizontal scroll view.
+    CGRect visible = target.frame;
+    visible.origin.x -= AppSpacing16;
+    visible.size.width += AppSpacing32;
+    [_tab_scroll_view scrollRectToVisible:visible animated:animated];
 }
 
--(UIViewController*)pageViewController:(UIPageViewController*)page_view_controller
-     viewControllerAfterViewController:(UIViewController*)view_controller {
-    NSInteger index = [_page_view_controllers indexOfObject:view_controller];
-    if (index == NSNotFound || index + 1 >= [_page_view_controllers count]) {
-        return nil;
-    }
-    return _page_view_controllers[index + 1];
+#pragma mark - UIPageViewControllerDataSource / Delegate
+
+-(UIViewController*)pageViewController:(UIPageViewController*)pvc
+    viewControllerBeforeViewController:(UIViewController*)vc {
+    NSInteger i = [_page_view_controllers indexOfObject:vc];
+    if (i == NSNotFound || i <= 0) return nil;
+    return _page_view_controllers[i - 1];
+}
+-(UIViewController*)pageViewController:(UIPageViewController*)pvc
+     viewControllerAfterViewController:(UIViewController*)vc {
+    NSInteger i = [_page_view_controllers indexOfObject:vc];
+    if (i == NSNotFound || i + 1 >= (NSInteger)_page_view_controllers.count) return nil;
+    return _page_view_controllers[i + 1];
 }
 
--(void)pageViewController:(UIPageViewController*)page_view_controller didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray*)previous_view_controllers transitionCompleted:(BOOL)completed {
-    if (finished && completed && [previous_view_controllers count] > 0) {
-        _current_page_index = [_page_view_controllers indexOfObject:_page_view_controller.viewControllers[0]];
-        [self didTransitionToPageAtIndex:_current_page_index completed:completed];
-    }
-}
-
--(void)goToPageAtIndex:(NSInteger)index {
-    if (_current_page_index == index || index >= [_page_view_controllers count]) {
-        return;
-    }
-    UIPageViewControllerNavigationDirection direction = _current_page_index < index ? UIPageViewControllerNavigationDirectionForward : UIPageViewControllerNavigationDirectionReverse;
-    _current_page_index = index;
-    
-    _page_view_controller.dataSource = nil;
-    _page_view_controller.dataSource = self;
-    [_page_view_controller setViewControllers:@[_page_view_controllers[index]] direction:direction animated:YES completion:nil];
-}
-
--(BOOL)gestureRecognizer:(UIPanGestureRecognizer*)gesture_recognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer*)other_gesture_recognizer {
-    if (![other_gesture_recognizer isKindOfClass:UIPanGestureRecognizer.class]) {
-        return NO;
-    }
-    return YES;
-}
--(void)onPageViewControllerPanGesture:(UIPanGestureRecognizer*)gesture_recognizer {
-    if (gesture_recognizer.state == UIGestureRecognizerStateBegan) {
-        _segmented_control.userInteractionEnabled = NO;
-    } else if (gesture_recognizer.state == UIGestureRecognizerStateEnded) {
-        _segmented_control.userInteractionEnabled = YES;
-    }
+-(void)pageViewController:(UIPageViewController*)pvc
+       didFinishAnimating:(BOOL)finished
+  previousViewControllers:(NSArray*)prev
+      transitionCompleted:(BOOL)completed {
+    if (!(finished && completed) || pvc.viewControllers.count == 0) return;
+    NSInteger idx = [_page_view_controllers indexOfObject:pvc.viewControllers.firstObject];
+    if (idx == NSNotFound || idx == _current_index) return;
+    _current_index = idx;
+    [self updateSelectionAtIndex:idx animated:YES];
 }
 
 @end

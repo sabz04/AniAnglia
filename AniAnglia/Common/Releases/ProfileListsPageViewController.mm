@@ -8,6 +8,7 @@
 #import <Foundation/Foundation.h>
 #import "ProfileListsPageViewController.h"
 #import "AppColor.h"
+#import "AppBackdrop.h"
 #import "StringCvt.h"
 #import "SegmentedPageViewController.h"
 #import "AppDataController.h"
@@ -79,6 +80,8 @@
    
 }
 -(void)setupLayout {
+    // Bookmarks lists need a clean neutral background — coral/blue backdrop
+    // competes with the dense list content underneath.
     self.view.backgroundColor = [AppColorProvider backgroundColor];
 }
 

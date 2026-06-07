@@ -7,6 +7,117 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		003FC36C27FAF061FBE3C9EC /* RatingSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88261A5CEAAC347930B6EF7A /* RatingSheet.swift */; };
+		007BB55FE50D956BB272BFF9 /* YukimoRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9BB3DA5487556FBED14A63D /* YukimoRoute.swift */; };
+		01DBEB2CD3E31273AEA4A072 /* RatingBadge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51271BC5183DB215610ED32D /* RatingBadge.mm */; };
+		027BE8F58E73D04EE1BEE65A /* LoadingSkeletonView.h in Sources */ = {isa = PBXBuildFile; fileRef = 493C3DD9C4B6FA2AA1885A1C /* LoadingSkeletonView.h */; };
+		03DB024942D6541F4F6FBA55 /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4188AA0E8B66AFA5B2DDCAD /* LoginViewModel.swift */; };
+		04D06D5E3331AA6C826F1D19 /* DownloadsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA88841AA50CFBD3AFABB994 /* DownloadsView.swift */; };
+		05DCFBD9ED73C431E1D7AF44 /* RegisterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02EF34FD7700C14D8D282B2A /* RegisterViewModel.swift */; };
+		07070BC5457AD8D6859400D4 /* PosterRail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD22918BAED86DD3912D945 /* PosterRail.swift */; };
+		09A1E3A4F3356D5D83D7DFD0 /* EpisodeSourceSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7086B249F26130EA679033AE /* EpisodeSourceSummary.swift */; };
+		12DEB947FBDEF14874E256DE /* YukimoAsyncImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1856BAB5CD310705F6FAC27 /* YukimoAsyncImage.swift */; };
+		15852359CEE72E8160830B15 /* PosterCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 422C136F2DF2E92F2BD18259 /* PosterCard.swift */; };
+		1725FE4CA3018291D3CC435C /* YukimoCodeInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F949781611E3F21D01D558F /* YukimoCodeInput.swift */; };
+		1AC5B3FCF217F929888C8A5A /* YukimoSibnetParser.mm in Sources */ = {isa = PBXBuildFile; fileRef = BD3C192BC0795047E9F741BA /* YukimoSibnetParser.mm */; };
+		1B205D9EF295AAF5A8A93F29 /* YukimoFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FF0FAB94069BEFADD0A42E1 /* YukimoFlowLayout.swift */; };
+		1C1375DEA3FFB44F8666FDD7 /* YukimoPrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4C3F0FE2DBE96ACCACABB1 /* YukimoPrimaryButton.swift */; };
+		1D230752B42C515F6F950401 /* WatchStatusPill.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4EC8B4ED531CBC48DC312B5A /* WatchStatusPill.mm */; };
+		2060259FBE7A8A281F1AE174 /* YukimoSettingsBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5C0371A65727C0345321C94F /* YukimoSettingsBridge.mm */; };
+		23AC3E73EC295AAB3A13BE4E /* GlassBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F38605D77B78E8BD4F1433F /* GlassBackground.swift */; };
+		25FBE0FAEDFBBE98DE16443F /* YukimoStreamDTO.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6DED392C11129D3C8C3E1513 /* YukimoStreamDTO.mm */; };
+		2782D0AF5E4E08C7BB2C7B57 /* HeroCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA582115F1041E58BEDB6EA /* HeroCard.swift */; };
+		2DEBE79FA54FA9B9F465D7E9 /* ProfileDistributionChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = D321EF597775F78598E4A263 /* ProfileDistributionChart.swift */; };
+		3681BD0197CA89D99A129B97 /* YukimoPageIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFC07A3F8B37D4B40C4AAB2C /* YukimoPageIndicator.swift */; };
+		386513DC4F9F81EAFFDC21B0 /* RatingBadge.h in Sources */ = {isa = PBXBuildFile; fileRef = 2D67567B11DE1107778230BE /* RatingBadge.h */; };
+		38ADC7195010EF554CE21C9F /* YukimoHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C828F8AB0A35DAAC8330F1D /* YukimoHistoryStore.swift */; };
+		3A599D1F78C04E9368EA5731 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FED3E5C0D3C55ED8F235133 /* SettingsView.swift */; };
+		3AD81E84BF4710120C54008A /* SearchFiltersSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6606DECB2302102EB6BAD2 /* SearchFiltersSheet.swift */; };
+		3E011C3B736B24582A33623F /* YukimoLibraryBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2BD29FFC5F056616F403EF6A /* YukimoLibraryBridge.mm */; };
+		3F0C723B68D404EFCB48D81B /* YukimoOrientationLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60BF2752DFC14A2469C1BA9A /* YukimoOrientationLock.swift */; };
+		3F2731B61C724D46DEC3D5F9 /* YukimoHomeBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 641FA5BA5B49D5C19E05AFED /* YukimoHomeBridge.mm */; };
+		40F2CAB6820301683B3FA21B /* ScreenshotsBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 614A4334A09D1A72B974D064 /* ScreenshotsBlock.swift */; };
+		4638158097F0045E626CAE13 /* YukimoAppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF39612737EC09B2801C6F69 /* YukimoAppState.swift */; };
+		48736717FE190C5C5811C69F /* YukimoMotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC3C6869F0B95200308DA6D /* YukimoMotion.swift */; };
+		4CE50259E55E56F0FB5A98FE /* YukimoTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = E85579FE8E40A3C5847A820E /* YukimoTypography.swift */; };
+		4E4018D6A1E96FC6AAAD17F0 /* LoadingSkeletonView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 50CB793358D1E3EAD05753CC /* LoadingSkeletonView.mm */; };
+		4E69AE338DB2649E7F16214C /* ForgotPasswordViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACC631E5DDCFFBE910E5D5F /* ForgotPasswordViewModel.swift */; };
+		4FCB25E9B96B35101585BE2D /* YukimoSessionBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = C6E73A00A5EE4162CE2A4FF5 /* YukimoSessionBridge.mm */; };
+		50DC80C651C747DDD22D33EA /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA3ADF05C7E24507D0F44783 /* HomeViewModel.swift */; };
+		553722366B5F0449B3EE5AB8 /* InfoStrip.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94450F4EFBDDB0914328DDC /* InfoStrip.swift */; };
+		586C5E786A5352A5CF5EF9E8 /* YukimoSearchBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D8BF113A69DA5963A82969 /* YukimoSearchBridge.mm */; };
+		5CB23F108842D3A41719044E /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD2550A89382A69117C3116 /* HomeView.swift */; };
+		62A11D1C40C2559B3EEB93CF /* YukimoUnwatchedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C8C26F1894E3BE22C6FC30 /* YukimoUnwatchedStore.swift */; };
+		68882774CA8E0F2063D9CA36 /* YukimoSpacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = D948803988A82E76674EEA9C /* YukimoSpacing.swift */; };
+		6BAA317E7B9F86C1890CBD63 /* YukimoReleaseDetailBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 95F0A5F3F9D9C817ECE5AAD7 /* YukimoReleaseDetailBridge.mm */; };
+		6D4342D426F04E4E0EE4CE9A /* AnimeDetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464176FC48F407C8CC3D3828 /* AnimeDetailsViewModel.swift */; };
+		70E7677C6AAAA12BFDAB48B9 /* AppBackdrop.mm in Sources */ = {isa = PBXBuildFile; fileRef = 77009ED3F635CBB541DD24D2 /* AppBackdrop.mm */; };
+		720B100EA43EC44405BD2CE4 /* YukimoTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A86C8CAFD8F1C09CD9F0D1 /* YukimoTextField.swift */; };
+		740E7E4C43A91631DC091B13 /* YukimoWatchedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C704019BB08F58187A7F77B /* YukimoWatchedStore.swift */; };
+		778B396A32EB9042B0EDED7A /* AuthChrome.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0F3675C3B6D5C158D6D587AD /* AuthChrome.mm */; };
+		7A1FF63401E415A4EDA35C15 /* YukimoIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E3C03AEB19088A4D1E9868B /* YukimoIcon.swift */; };
+		7A8CE4D28430C72ECA9A3AEC /* YukimoDownloadsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCAA7117C108B478CC14D513 /* YukimoDownloadsManager.swift */; };
+		7AFC77891672F76BC14CA368 /* YukimoPlayerPrefsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD53C61A4AF570C469094EE7 /* YukimoPlayerPrefsStore.swift */; };
+		7B52C0027E57235DBBA3F47A /* YukimoAuthBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = E3B6885E1B7350F1951AE326 /* YukimoAuthBridge.mm */; };
+		7DD8CE1B633D100C642833D4 /* YukimoShadow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59D1DBA2CCD1E5BB55061EC5 /* YukimoShadow.swift */; };
+		82F3F075B6AD288ED92AC337 /* YukimoGlassCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFD3A0795E78929AF6949F50 /* YukimoGlassCard.swift */; };
+		8420A5C4F8C6CCF90B55C451 /* YukimoSearchFilter.mm in Sources */ = {isa = PBXBuildFile; fileRef = DE4EE5989AA89844AEC66960 /* YukimoSearchFilter.mm */; };
+		879B1851ED747DC1B6386651 /* AnimeSecondaryActionsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3E9655493C6445E9EF2DD31 /* AnimeSecondaryActionsRow.swift */; };
+		8977E2FA180F630B74A05BD0 /* YukimoProgressStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03A9EA4DAF7B11A9AB462CC5 /* YukimoProgressStore.swift */; };
+		8C025FF989316772BFA92F96 /* YukimoProfileBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = B5FFC55718196C255B674A3A /* YukimoProfileBridge.mm */; };
+		8C54C04D6FC4F5A4DD031BA8 /* YukimoMainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3950BCF03AB616D9CE15EA61 /* YukimoMainTabView.swift */; };
+		8D0D18033AA0639F2CE0C29D /* AnimeHeroHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF57A5FED4ADD6C347D408E2 /* AnimeHeroHeader.swift */; };
+		9064CE75FB69F0B89E90CD7C /* YukimoPlayerBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = F3494CFCDD48FFF5F1568EF9 /* YukimoPlayerBridge.mm */; };
+		920B85D52E7825967C2367B7 /* LoadFailureState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7DEE8DFB8F841418C5DE44 /* LoadFailureState.swift */; };
+		92631E23DF26347CB769EC42 /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01B4395616F12EBC9260CCA1 /* RegisterView.swift */; };
+		938E02A6A2A825C26D3FDAC2 /* VerificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2B5208034B1299150830AD8 /* VerificationView.swift */; };
+		960DB335F3B3C36ECFE81AE1 /* DetailsActionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C525754C5CDD581B0A8001E0 /* DetailsActionRow.swift */; };
+		975C83459E73975A34D77C0B /* FullTitleSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E058A0FF00FF3363828C130 /* FullTitleSheet.swift */; };
+		9B0D69CA33B15E8CDE635D8D /* AnimeDetailsToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB2A0ADBD74C2E14CA0C12DF /* AnimeDetailsToolbar.swift */; };
+		9BFA4DF825396F985596778D /* SearchTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4C28844F9A0C621BCC5E5B4 /* SearchTabView.swift */; };
+		9DE542B8FD23A8EBCA8E65FE /* AuthChrome.h in Sources */ = {isa = PBXBuildFile; fileRef = 922AC563718C4DE589C1AB07 /* AuthChrome.h */; };
+		9F5B29F38C32F1316BBFB8A7 /* YukimoColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6089DEF2CAC09F6B56A32287 /* YukimoColor.swift */; };
+		9F8FDD9335C3EC60D216C69B /* DetailsBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB2A837F6C137C625A974269 /* DetailsBadge.swift */; };
+		A174117C2911AFA9C336BD8B /* YukimoVKParser.mm in Sources */ = {isa = PBXBuildFile; fileRef = 98570450130AD43BB1787B53 /* YukimoVKParser.mm */; };
+		A213F272AA7B5166E90F6349 /* ContinueWatchingBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FA88A3195219EBB4A70432A /* ContinueWatchingBlock.swift */; };
+		A21C4C6CD310EA4B24630B58 /* YukimoNotificationsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A871C23A791D97FE9978EC62 /* YukimoNotificationsManager.swift */; };
+		A3A49A708B71A6AF694B2172 /* YukimoReleaseDTO.mm in Sources */ = {isa = PBXBuildFile; fileRef = CD30291A48674AC3A5E432F9 /* YukimoReleaseDTO.mm */; };
+		A487508A81ABF09555592023 /* YukimoPlayerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527F527CED6D63ADDEEB12DD /* YukimoPlayerModel.swift */; };
+		A5C10CCE1EF39226B4FD1F0C /* FilterChip.mm in Sources */ = {isa = PBXBuildFile; fileRef = A9B011069459DFFE4BDFF506 /* FilterChip.mm */; };
+		A802C93D6A2A81147A371AF4 /* AppBackdrop.h in Sources */ = {isa = PBXBuildFile; fileRef = D819CC21BA3CFBB38C598B4A /* AppBackdrop.h */; };
+		A955A749747C2E269FF48036 /* AppHaptics.h in Sources */ = {isa = PBXBuildFile; fileRef = 0B826874D0FF7CE19A7C1DD2 /* AppHaptics.h */; };
+		A9BE28977DD17B339F0B15A2 /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7861891F726D8B00C1629C23 /* SplashView.swift */; };
+		A9F5D2B85A77E86178E0ADE2 /* VerificationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F7BB8D1C756CC4A0AFFF08B /* VerificationViewModel.swift */; };
+		ABF38C64BDAE1358DF0EA6DB /* AppHaptics.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96E309EA9857F4678C5020E4 /* AppHaptics.mm */; };
+		B1317C11AC0A56977A1D0010 /* ForgotPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0A06819148580198226F6F8 /* ForgotPasswordView.swift */; };
+		B4620933D43ED38B00198ABB /* PlaceholderTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 828B8B0CCF016BA7C80EE14D /* PlaceholderTabView.swift */; };
+		B647C8A7F4F12D834A1E11DE /* LibraryTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A39D7F08BDECB2E6F6966C69 /* LibraryTabView.swift */; };
+		B6677B1784DF38BF10192195 /* YukimoProfileDTO.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6BB3135580837A5EC51FF587 /* YukimoProfileDTO.mm */; };
+		B8ADBCF615B02BDEFA30828F /* EmptyStateView.h in Sources */ = {isa = PBXBuildFile; fileRef = 055689CF4D3588E057D508A7 /* EmptyStateView.h */; };
+		BC303CE02184ACD4584A533A /* ReleaseRowCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0197AC8726ACA9C9DB66147 /* ReleaseRowCard.swift */; };
+		BC4BE963C4A83F525962407C /* AuthValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38FB1FFD7A3BAA5AE91DD0BE /* AuthValidator.swift */; };
+		BCA2D979A214B13E254A5DEB /* SourcePickerRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 347D3F43018C5372BBB87400 /* SourcePickerRow.swift */; };
+		BD7A1162FB5CE25122BED727 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D825385CE7B7885D4ADA052D /* LoginView.swift */; };
+		BF793FE12D7C25952F671CCB /* MainPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B674988806E765A7A0665EC /* MainPlaceholderView.swift */; };
+		C7A00AB4FED0F83EFABFC548 /* YukimoPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292B345ACBCEA735D5219F64 /* YukimoPlayerView.swift */; };
+		CC2715E9A8362E51E2BFC365 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE0EB64349B24A6EC3EBA26B /* OnboardingView.swift */; };
+		CE5C4A3A7DB55D3B8C7247F3 /* ProfileTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3825CA814076EC0B83DD85AD /* ProfileTabView.swift */; };
+		D0940D19B030B29B1717506A /* AppMaterial.mm in Sources */ = {isa = PBXBuildFile; fileRef = D1A73EDA98EFB80C43EB7340 /* AppMaterial.mm */; };
+		D239C9C94E4A00B9315EEB8C /* YukimoScrubber.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAA22DFCD956A23F78BF4C9C /* YukimoScrubber.swift */; };
+		D530F1D8E70981DF876A45ED /* EpisodesSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C1F4FD69485C14688EF275C /* EpisodesSection.swift */; };
+		D6FB8397B32950ABA240E6FA /* AuthSuccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B53D722DA1EC9A83CCD37D14 /* AuthSuccessView.swift */; };
+		DA878D5C17906469CFEEE8E8 /* YukimoRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D13278B93B2C5CD57929D74 /* YukimoRootView.swift */; };
+		DAF715E5865705B463081C05 /* YukimoDetailsCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7E9DDA155CC78DE555E81F /* YukimoDetailsCache.swift */; };
+		DB311113C2A162D4C7870B63 /* AnimeDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99E54E2AAC68256A161A39 /* AnimeDetailsView.swift */; };
+		DB5D6513563890D8B555B8A5 /* YukimoLoadingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A545098CBBFB845CFA8B624 /* YukimoLoadingOverlay.swift */; };
+		DD7C8B6A4D63A345D4856EB3 /* AuthError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756BEBA5E5E9755A8D1B3ADB /* AuthError.swift */; };
+		DDE536C8A05547038DFE45AD /* YukimoEpisodeDTO.mm in Sources */ = {isa = PBXBuildFile; fileRef = 66D58217B6A4CBDCFD2056F8 /* YukimoEpisodeDTO.mm */; };
+		E1BB807BF763D3F199AC14E0 /* FilterChip.h in Sources */ = {isa = PBXBuildFile; fileRef = 55039A4852A6D0F79EAC5A71 /* FilterChip.h */; };
+		E2FE8E9C826AFCE824CFE919 /* EmptyStateView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 39C66DA7858E7D135BD43EB8 /* EmptyStateView.mm */; };
+		E3C141BA3DE920DAFD71C78E /* PlayerLayerHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE641936A7776D1A7941D651 /* PlayerLayerHost.swift */; };
+		E587BAF63F00E2084107726D /* WatchStatusPill.h in Sources */ = {isa = PBXBuildFile; fileRef = 8BAE0DDB583845B00A64E826 /* WatchStatusPill.h */; };
+		E6896199C49280B6A01F8C3C /* ContinueWatchingCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C88AE3E8EDB84C15CE89F94 /* ContinueWatchingCard.swift */; };
+		E8A7190D0FA88EF1E5C6A23B /* YukimoErrorBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B09877FBF8377451DE22724 /* YukimoErrorBanner.swift */; };
 		EF0D7D192D26F0E7000E516A /* libanixart.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF0D7D182D26F0E7000E516A /* libanixart.xcframework */; };
 		EF15C9222DF8582100335578 /* NamedSectionView.mm in Sources */ = {isa = PBXBuildFile; fileRef = EF15C9212DF8582100335578 /* NamedSectionView.mm */; };
 		EF17A2E62DB6B259003429FC /* ProfilesPageableDataProvider.mm in Sources */ = {isa = PBXBuildFile; fileRef = EF17A2E52DB6B259003429FC /* ProfilesPageableDataProvider.mm */; };
@@ -95,9 +206,143 @@
 		EFFA21DD2DB0220E007D8AD4 /* CollectionsCollectionViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = EFFA21DC2DB0220E007D8AD4 /* CollectionsCollectionViewController.mm */; };
 		EFFA3C442DAB150E00DE042A /* CommentsTableViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = EFFA3C432DAB150E00DE042A /* CommentsTableViewController.mm */; };
 		EFFA3C482DAD535200DE042A /* ProfileCommentsPageViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = EFFA3C472DAD535200DE042A /* ProfileCommentsPageViewController.mm */; };
+		F08BCAE87A4B3347D3EBE2B9 /* YukimoGradientBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184AED8A52B806F6D709E715 /* YukimoGradientBackground.swift */; };
+		F32653D4A0B46BD247014DFF /* EpisodeRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D517808D8BB2F32FDBB65ED /* EpisodeRow.swift */; };
+		F4445F326E7A1C87F1B2CC63 /* AnimeWatchButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD188FF36D14D3875819EAB9 /* AnimeWatchButton.swift */; };
+		F4E63EC0E3070CCF07F07177 /* SynopsisBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = F340FAC6E2FBB08409DA4C41 /* SynopsisBlock.swift */; };
+		F9D0F2B08089C89D0FABFDC6 /* YukimoHostFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41A21FFA5687985A7009B789 /* YukimoHostFactory.swift */; };
+		FD85532273459E4393C53375 /* AppMaterial.h in Sources */ = {isa = PBXBuildFile; fileRef = BBAA29588C66B020231A679F /* AppMaterial.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		01B4395616F12EBC9260CCA1 /* RegisterView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
+		02EF34FD7700C14D8D282B2A /* RegisterViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RegisterViewModel.swift; sourceTree = "<group>"; };
+		03A9EA4DAF7B11A9AB462CC5 /* YukimoProgressStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoProgressStore.swift; sourceTree = "<group>"; };
+		055689CF4D3588E057D508A7 /* EmptyStateView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EmptyStateView.h; sourceTree = "<group>"; };
+		07DDC7742BB7E83D8322AE2E /* YukimoHomeBridge.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = YukimoHomeBridge.h; sourceTree = "<group>"; };
+		0AD2550A89382A69117C3116 /* HomeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		0B826874D0FF7CE19A7C1DD2 /* AppHaptics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppHaptics.h; sourceTree = "<group>"; };
+		0D19A14BB475822119A734AD /* YukimoProfileBridge.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = YukimoProfileBridge.h; sourceTree = "<group>"; };
+		0E058A0FF00FF3363828C130 /* FullTitleSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FullTitleSheet.swift; sourceTree = "<group>"; };
+		0EB6788A2C5D9956895E56C3 /* YukimoReleaseDTO.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = YukimoReleaseDTO.h; sourceTree = "<group>"; };
+		0F3675C3B6D5C158D6D587AD /* AuthChrome.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AuthChrome.mm; sourceTree = "<group>"; };
+		16278DC1D4FE81920C8E546E /* YukimoSearchFilter.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = YukimoSearchFilter.h; sourceTree = "<group>"; };
+		184AED8A52B806F6D709E715 /* YukimoGradientBackground.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoGradientBackground.swift; sourceTree = "<group>"; };
+		1A545098CBBFB845CFA8B624 /* YukimoLoadingOverlay.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoLoadingOverlay.swift; sourceTree = "<group>"; };
+		1D7D8A1953C96D2FAACCF93D /* YukimoVKParser.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = YukimoVKParser.h; sourceTree = "<group>"; };
+		1FF0FAB94069BEFADD0A42E1 /* YukimoFlowLayout.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoFlowLayout.swift; sourceTree = "<group>"; };
+		292B345ACBCEA735D5219F64 /* YukimoPlayerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoPlayerView.swift; sourceTree = "<group>"; };
+		2BD29FFC5F056616F403EF6A /* YukimoLibraryBridge.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = YukimoLibraryBridge.mm; sourceTree = "<group>"; };
+		2C704019BB08F58187A7F77B /* YukimoWatchedStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoWatchedStore.swift; sourceTree = "<group>"; };
+		2CB638D23BB7B0929FC43EE0 /* YukimoLibraryBridge.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = YukimoLibraryBridge.h; sourceTree = "<group>"; };
+		2CD22918BAED86DD3912D945 /* PosterRail.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PosterRail.swift; sourceTree = "<group>"; };
+		2D67567B11DE1107778230BE /* RatingBadge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RatingBadge.h; sourceTree = "<group>"; };
+		347D3F43018C5372BBB87400 /* SourcePickerRow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SourcePickerRow.swift; sourceTree = "<group>"; };
+		3825CA814076EC0B83DD85AD /* ProfileTabView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ProfileTabView.swift; sourceTree = "<group>"; };
+		38FB1FFD7A3BAA5AE91DD0BE /* AuthValidator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuthValidator.swift; sourceTree = "<group>"; };
+		3950BCF03AB616D9CE15EA61 /* YukimoMainTabView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoMainTabView.swift; sourceTree = "<group>"; };
+		39C66DA7858E7D135BD43EB8 /* EmptyStateView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = EmptyStateView.mm; sourceTree = "<group>"; };
+		3A4C3F0FE2DBE96ACCACABB1 /* YukimoPrimaryButton.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoPrimaryButton.swift; sourceTree = "<group>"; };
+		3B674988806E765A7A0665EC /* MainPlaceholderView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MainPlaceholderView.swift; sourceTree = "<group>"; };
+		3C1F4FD69485C14688EF275C /* EpisodesSection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EpisodesSection.swift; sourceTree = "<group>"; };
+		3C828F8AB0A35DAAC8330F1D /* YukimoHistoryStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoHistoryStore.swift; sourceTree = "<group>"; };
+		41A21FFA5687985A7009B789 /* YukimoHostFactory.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoHostFactory.swift; sourceTree = "<group>"; };
+		422C136F2DF2E92F2BD18259 /* PosterCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PosterCard.swift; sourceTree = "<group>"; };
+		464176FC48F407C8CC3D3828 /* AnimeDetailsViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AnimeDetailsViewModel.swift; sourceTree = "<group>"; };
+		493C3DD9C4B6FA2AA1885A1C /* LoadingSkeletonView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoadingSkeletonView.h; sourceTree = "<group>"; };
+		4B09877FBF8377451DE22724 /* YukimoErrorBanner.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoErrorBanner.swift; sourceTree = "<group>"; };
+		4EC8B4ED531CBC48DC312B5A /* WatchStatusPill.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = WatchStatusPill.mm; sourceTree = "<group>"; };
+		4F9BDC5CD3610A863FB100DC /* Yukimo-Bridging-Header.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Yukimo-Bridging-Header.h"; sourceTree = "<group>"; };
+		50CB793358D1E3EAD05753CC /* LoadingSkeletonView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = LoadingSkeletonView.mm; sourceTree = "<group>"; };
+		51271BC5183DB215610ED32D /* RatingBadge.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RatingBadge.mm; sourceTree = "<group>"; };
+		527F527CED6D63ADDEEB12DD /* YukimoPlayerModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoPlayerModel.swift; sourceTree = "<group>"; };
+		55039A4852A6D0F79EAC5A71 /* FilterChip.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FilterChip.h; sourceTree = "<group>"; };
+		55495870498A5B097FC1B352 /* YukimoReleaseDetailBridge.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = YukimoReleaseDetailBridge.h; sourceTree = "<group>"; };
+		59D1DBA2CCD1E5BB55061EC5 /* YukimoShadow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoShadow.swift; sourceTree = "<group>"; };
+		5B7DEE8DFB8F841418C5DE44 /* LoadFailureState.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LoadFailureState.swift; sourceTree = "<group>"; };
+		5B7E9DDA155CC78DE555E81F /* YukimoDetailsCache.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoDetailsCache.swift; sourceTree = "<group>"; };
+		5C0371A65727C0345321C94F /* YukimoSettingsBridge.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = YukimoSettingsBridge.mm; sourceTree = "<group>"; };
+		5D517808D8BB2F32FDBB65ED /* EpisodeRow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EpisodeRow.swift; sourceTree = "<group>"; };
+		5F949781611E3F21D01D558F /* YukimoCodeInput.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoCodeInput.swift; sourceTree = "<group>"; };
+		5FA88A3195219EBB4A70432A /* ContinueWatchingBlock.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ContinueWatchingBlock.swift; sourceTree = "<group>"; };
+		6089DEF2CAC09F6B56A32287 /* YukimoColor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoColor.swift; sourceTree = "<group>"; };
+		60BF2752DFC14A2469C1BA9A /* YukimoOrientationLock.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoOrientationLock.swift; sourceTree = "<group>"; };
+		614A4334A09D1A72B974D064 /* ScreenshotsBlock.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ScreenshotsBlock.swift; sourceTree = "<group>"; };
+		641FA5BA5B49D5C19E05AFED /* YukimoHomeBridge.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = YukimoHomeBridge.mm; sourceTree = "<group>"; };
+		66D58217B6A4CBDCFD2056F8 /* YukimoEpisodeDTO.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = YukimoEpisodeDTO.mm; sourceTree = "<group>"; };
+		6BB3135580837A5EC51FF587 /* YukimoProfileDTO.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = YukimoProfileDTO.mm; sourceTree = "<group>"; };
+		6C88AE3E8EDB84C15CE89F94 /* ContinueWatchingCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ContinueWatchingCard.swift; sourceTree = "<group>"; };
+		6DED392C11129D3C8C3E1513 /* YukimoStreamDTO.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = YukimoStreamDTO.mm; sourceTree = "<group>"; };
+		7086B249F26130EA679033AE /* EpisodeSourceSummary.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EpisodeSourceSummary.swift; sourceTree = "<group>"; };
+		756BEBA5E5E9755A8D1B3ADB /* AuthError.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuthError.swift; sourceTree = "<group>"; };
+		77009ED3F635CBB541DD24D2 /* AppBackdrop.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppBackdrop.mm; sourceTree = "<group>"; };
+		7861891F726D8B00C1629C23 /* SplashView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
+		7E3C03AEB19088A4D1E9868B /* YukimoIcon.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoIcon.swift; sourceTree = "<group>"; };
+		7F38605D77B78E8BD4F1433F /* GlassBackground.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GlassBackground.swift; sourceTree = "<group>"; };
+		7F7BB8D1C756CC4A0AFFF08B /* VerificationViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VerificationViewModel.swift; sourceTree = "<group>"; };
+		7FED3E5C0D3C55ED8F235133 /* SettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		828B8B0CCF016BA7C80EE14D /* PlaceholderTabView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlaceholderTabView.swift; sourceTree = "<group>"; };
+		84C8C26F1894E3BE22C6FC30 /* YukimoUnwatchedStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoUnwatchedStore.swift; sourceTree = "<group>"; };
+		88261A5CEAAC347930B6EF7A /* RatingSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RatingSheet.swift; sourceTree = "<group>"; };
+		8BAE0DDB583845B00A64E826 /* WatchStatusPill.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WatchStatusPill.h; sourceTree = "<group>"; };
+		922AC563718C4DE589C1AB07 /* AuthChrome.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AuthChrome.h; sourceTree = "<group>"; };
+		95F0A5F3F9D9C817ECE5AAD7 /* YukimoReleaseDetailBridge.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = YukimoReleaseDetailBridge.mm; sourceTree = "<group>"; };
+		96E309EA9857F4678C5020E4 /* AppHaptics.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppHaptics.mm; sourceTree = "<group>"; };
+		98570450130AD43BB1787B53 /* YukimoVKParser.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = YukimoVKParser.mm; sourceTree = "<group>"; };
+		9D13278B93B2C5CD57929D74 /* YukimoRootView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoRootView.swift; sourceTree = "<group>"; };
+		9F6606DECB2302102EB6BAD2 /* SearchFiltersSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SearchFiltersSheet.swift; sourceTree = "<group>"; };
+		A2B5208034B1299150830AD8 /* VerificationView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VerificationView.swift; sourceTree = "<group>"; };
+		A33F78C5E1F147FDE6EF51C6 /* YukimoProfileDTO.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = YukimoProfileDTO.h; sourceTree = "<group>"; };
+		A39D7F08BDECB2E6F6966C69 /* LibraryTabView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LibraryTabView.swift; sourceTree = "<group>"; };
+		A871C23A791D97FE9978EC62 /* YukimoNotificationsManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoNotificationsManager.swift; sourceTree = "<group>"; };
+		A9B011069459DFFE4BDFF506 /* FilterChip.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FilterChip.mm; sourceTree = "<group>"; };
+		AD188FF36D14D3875819EAB9 /* AnimeWatchButton.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AnimeWatchButton.swift; sourceTree = "<group>"; };
+		AFD3A0795E78929AF6949F50 /* YukimoGlassCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoGlassCard.swift; sourceTree = "<group>"; };
+		B0197AC8726ACA9C9DB66147 /* ReleaseRowCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReleaseRowCard.swift; sourceTree = "<group>"; };
+		B1856BAB5CD310705F6FAC27 /* YukimoAsyncImage.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoAsyncImage.swift; sourceTree = "<group>"; };
+		B53D722DA1EC9A83CCD37D14 /* AuthSuccessView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuthSuccessView.swift; sourceTree = "<group>"; };
+		B5FFC55718196C255B674A3A /* YukimoProfileBridge.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = YukimoProfileBridge.mm; sourceTree = "<group>"; };
+		B6250FBDA08C8CC1F278750A /* YukimoSessionBridge.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = YukimoSessionBridge.h; sourceTree = "<group>"; };
+		B9E1BB15C26683E609C29EA8 /* YukimoSibnetParser.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = YukimoSibnetParser.h; sourceTree = "<group>"; };
+		BACC631E5DDCFFBE910E5D5F /* ForgotPasswordViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ForgotPasswordViewModel.swift; sourceTree = "<group>"; };
+		BBAA29588C66B020231A679F /* AppMaterial.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppMaterial.h; sourceTree = "<group>"; };
+		BD3C192BC0795047E9F741BA /* YukimoSibnetParser.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = YukimoSibnetParser.mm; sourceTree = "<group>"; };
+		BE641936A7776D1A7941D651 /* PlayerLayerHost.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlayerLayerHost.swift; sourceTree = "<group>"; };
+		BF39612737EC09B2801C6F69 /* YukimoAppState.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoAppState.swift; sourceTree = "<group>"; };
+		BFC07A3F8B37D4B40C4AAB2C /* YukimoPageIndicator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoPageIndicator.swift; sourceTree = "<group>"; };
+		C041919F520F25215584EBE2 /* YukimoAuthBridge.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = YukimoAuthBridge.h; sourceTree = "<group>"; };
+		C4188AA0E8B66AFA5B2DDCAD /* LoginViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
+		C525754C5CDD581B0A8001E0 /* DetailsActionRow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DetailsActionRow.swift; sourceTree = "<group>"; };
+		C6E73A00A5EE4162CE2A4FF5 /* YukimoSessionBridge.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = YukimoSessionBridge.mm; sourceTree = "<group>"; };
+		C9BB3DA5487556FBED14A63D /* YukimoRoute.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoRoute.swift; sourceTree = "<group>"; };
+		CA3ADF05C7E24507D0F44783 /* HomeViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
+		CB2A837F6C137C625A974269 /* DetailsBadge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DetailsBadge.swift; sourceTree = "<group>"; };
+		CD30291A48674AC3A5E432F9 /* YukimoReleaseDTO.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = YukimoReleaseDTO.mm; sourceTree = "<group>"; };
+		CDC3C6869F0B95200308DA6D /* YukimoMotion.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoMotion.swift; sourceTree = "<group>"; };
+		D0A06819148580198226F6F8 /* ForgotPasswordView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ForgotPasswordView.swift; sourceTree = "<group>"; };
+		D1A73EDA98EFB80C43EB7340 /* AppMaterial.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppMaterial.mm; sourceTree = "<group>"; };
+		D321EF597775F78598E4A263 /* ProfileDistributionChart.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ProfileDistributionChart.swift; sourceTree = "<group>"; };
+		D4C28844F9A0C621BCC5E5B4 /* SearchTabView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SearchTabView.swift; sourceTree = "<group>"; };
+		D59D8D826EF23F9B1E51F3DE /* YukimoStreamDTO.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = YukimoStreamDTO.h; sourceTree = "<group>"; };
+		D636A72C1B287B63B30FA2E5 /* YukimoPlayerBridge.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = YukimoPlayerBridge.h; sourceTree = "<group>"; };
+		D819CC21BA3CFBB38C598B4A /* AppBackdrop.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppBackdrop.h; sourceTree = "<group>"; };
+		D825385CE7B7885D4ADA052D /* LoginView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		D948803988A82E76674EEA9C /* YukimoSpacing.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoSpacing.swift; sourceTree = "<group>"; };
+		DA99E54E2AAC68256A161A39 /* AnimeDetailsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AnimeDetailsView.swift; sourceTree = "<group>"; };
+		DACC80A8E1E1CB4332EA44E2 /* YukimoSettingsBridge.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = YukimoSettingsBridge.h; sourceTree = "<group>"; };
+		DC074E3DD8FD97A187BA0042 /* YukimoSearchBridge.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = YukimoSearchBridge.h; sourceTree = "<group>"; };
+		DD53C61A4AF570C469094EE7 /* YukimoPlayerPrefsStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoPlayerPrefsStore.swift; sourceTree = "<group>"; };
+		DE0EB64349B24A6EC3EBA26B /* OnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		DE4EE5989AA89844AEC66960 /* YukimoSearchFilter.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = YukimoSearchFilter.mm; sourceTree = "<group>"; };
+		DF57A5FED4ADD6C347D408E2 /* AnimeHeroHeader.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AnimeHeroHeader.swift; sourceTree = "<group>"; };
+		E0A86C8CAFD8F1C09CD9F0D1 /* YukimoTextField.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoTextField.swift; sourceTree = "<group>"; };
+		E3B6885E1B7350F1951AE326 /* YukimoAuthBridge.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = YukimoAuthBridge.mm; sourceTree = "<group>"; };
+		E4992ABF696E6B46B0E2BAB2 /* YukimoEpisodeDTO.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = YukimoEpisodeDTO.h; sourceTree = "<group>"; };
+		E4D8BF113A69DA5963A82969 /* YukimoSearchBridge.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = YukimoSearchBridge.mm; sourceTree = "<group>"; };
+		E85579FE8E40A3C5847A820E /* YukimoTypography.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoTypography.swift; sourceTree = "<group>"; };
+		E94450F4EFBDDB0914328DDC /* InfoStrip.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = InfoStrip.swift; sourceTree = "<group>"; };
+		EAA22DFCD956A23F78BF4C9C /* YukimoScrubber.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoScrubber.swift; sourceTree = "<group>"; };
+		EB2A0ADBD74C2E14CA0C12DF /* AnimeDetailsToolbar.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AnimeDetailsToolbar.swift; sourceTree = "<group>"; };
 		EF0D7D182D26F0E7000E516A /* libanixart.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libanixart.xcframework; path = AniAnglia/Libraries/aateam/libanixart/libanixart.xcframework; sourceTree = "<group>"; };
 		EF0D7D1C2D26F0F9000E516A /* libtorrentrepo.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libtorrentrepo.xcframework; path = AniAnglia/Libraries/aateam/libtorrentrepo/libtorrentrepo.xcframework; sourceTree = "<group>"; };
 		EF15C91F2DF75B3A00335578 /* DataReloadable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DataReloadable.h; sourceTree = "<group>"; };
@@ -1417,6 +1662,13 @@
 		EFFA3C452DAB151C00DE042A /* CommentsTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommentsTableViewController.h; sourceTree = "<group>"; };
 		EFFA3C462DAD534100DE042A /* ProfileCommentsPageViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProfileCommentsPageViewController.h; sourceTree = "<group>"; };
 		EFFA3C472DAD535200DE042A /* ProfileCommentsPageViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ProfileCommentsPageViewController.mm; sourceTree = "<group>"; };
+		F340FAC6E2FBB08409DA4C41 /* SynopsisBlock.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SynopsisBlock.swift; sourceTree = "<group>"; };
+		F3494CFCDD48FFF5F1568EF9 /* YukimoPlayerBridge.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = YukimoPlayerBridge.mm; sourceTree = "<group>"; };
+		F3E9655493C6445E9EF2DD31 /* AnimeSecondaryActionsRow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AnimeSecondaryActionsRow.swift; sourceTree = "<group>"; };
+		F54A5E8084CC88DE219EB4A0 /* YukimoListStatus.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = YukimoListStatus.h; sourceTree = "<group>"; };
+		FA88841AA50CFBD3AFABB994 /* DownloadsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DownloadsView.swift; sourceTree = "<group>"; };
+		FCAA7117C108B478CC14D513 /* YukimoDownloadsManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = YukimoDownloadsManager.swift; sourceTree = "<group>"; };
+		FDA582115F1041E58BEDB6EA /* HeroCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HeroCard.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1447,6 +1699,389 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1171249C768A73F3D3C07D64 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				347D3F43018C5372BBB87400 /* SourcePickerRow.swift */,
+				614A4334A09D1A72B974D064 /* ScreenshotsBlock.swift */,
+				C525754C5CDD581B0A8001E0 /* DetailsActionRow.swift */,
+				88261A5CEAAC347930B6EF7A /* RatingSheet.swift */,
+				F340FAC6E2FBB08409DA4C41 /* SynopsisBlock.swift */,
+				E94450F4EFBDDB0914328DDC /* InfoStrip.swift */,
+				5B7DEE8DFB8F841418C5DE44 /* LoadFailureState.swift */,
+				EB2A0ADBD74C2E14CA0C12DF /* AnimeDetailsToolbar.swift */,
+				DF57A5FED4ADD6C347D408E2 /* AnimeHeroHeader.swift */,
+				F3E9655493C6445E9EF2DD31 /* AnimeSecondaryActionsRow.swift */,
+				AD188FF36D14D3875819EAB9 /* AnimeWatchButton.swift */,
+				5FA88A3195219EBB4A70432A /* ContinueWatchingBlock.swift */,
+				CB2A837F6C137C625A974269 /* DetailsBadge.swift */,
+				5D517808D8BB2F32FDBB65ED /* EpisodeRow.swift */,
+				7086B249F26130EA679033AE /* EpisodeSourceSummary.swift */,
+				3C1F4FD69485C14688EF275C /* EpisodesSection.swift */,
+				0E058A0FF00FF3363828C130 /* FullTitleSheet.swift */,
+			);
+			name = Components;
+			path = Components;
+			sourceTree = "<group>";
+		};
+		1670671910AEBBC1FCBAABF3 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Services;
+			path = Services;
+			sourceTree = "<group>";
+		};
+		1DED7D6623D9095C5B26CB4B /* Downloads */ = {
+			isa = PBXGroup;
+			children = (
+				FA88841AA50CFBD3AFABB994 /* DownloadsView.swift */,
+				FCAA7117C108B478CC14D513 /* YukimoDownloadsManager.swift */,
+			);
+			name = Downloads;
+			path = Downloads;
+			sourceTree = "<group>";
+		};
+		291C1C3F913440C9FBA00590 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				756BEBA5E5E9755A8D1B3ADB /* AuthError.swift */,
+				38FB1FFD7A3BAA5AE91DD0BE /* AuthValidator.swift */,
+			);
+			name = Shared;
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		2B8623314B8767C2109E5002 /* Splash */ = {
+			isa = PBXGroup;
+			children = (
+				7861891F726D8B00C1629C23 /* SplashView.swift */,
+			);
+			name = Splash;
+			path = Splash;
+			sourceTree = "<group>";
+		};
+		2DF9C699ACB3196AC261252A /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				6C88AE3E8EDB84C15CE89F94 /* ContinueWatchingCard.swift */,
+				FDA582115F1041E58BEDB6EA /* HeroCard.swift */,
+				422C136F2DF2E92F2BD18259 /* PosterCard.swift */,
+				2CD22918BAED86DD3912D945 /* PosterRail.swift */,
+				B0197AC8726ACA9C9DB66147 /* ReleaseRowCard.swift */,
+			);
+			name = Components;
+			path = Components;
+			sourceTree = "<group>";
+		};
+		4772EE8476CCB39A2EA063EE /* ForgotPassword */ = {
+			isa = PBXGroup;
+			children = (
+				D0A06819148580198226F6F8 /* ForgotPasswordView.swift */,
+				BACC631E5DDCFFBE910E5D5F /* ForgotPasswordViewModel.swift */,
+			);
+			name = ForgotPassword;
+			path = ForgotPassword;
+			sourceTree = "<group>";
+		};
+		5541EA5F95B54FE741E4A294 /* Yukimo */ = {
+			isa = PBXGroup;
+			children = (
+				7EFEFBF6303C96CDE18ABEBF /* App */,
+				9FC9C4ED59AB227F96386BA5 /* Bridge */,
+				FB08B775DC0387D4CF6C047C /* DesignSystem */,
+				A57BE332655A2B4864DB8826 /* Features */,
+				1670671910AEBBC1FCBAABF3 /* Services */,
+			);
+			name = Yukimo;
+			path = Yukimo;
+			sourceTree = "<group>";
+		};
+		57210A937525D3B24DC21A65 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				DE0EB64349B24A6EC3EBA26B /* OnboardingView.swift */,
+			);
+			name = Onboarding;
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		667400DE45A9C7945225FA2D /* Modifiers */ = {
+			isa = PBXGroup;
+			children = (
+				7F38605D77B78E8BD4F1433F /* GlassBackground.swift */,
+			);
+			name = Modifiers;
+			path = Modifiers;
+			sourceTree = "<group>";
+		};
+		69160594A2F92FD29AD4BB51 /* Search */ = {
+			isa = PBXGroup;
+			children = (
+				D4C28844F9A0C621BCC5E5B4 /* SearchTabView.swift */,
+				9F6606DECB2302102EB6BAD2 /* SearchFiltersSheet.swift */,
+			);
+			name = Search;
+			path = Search;
+			sourceTree = "<group>";
+		};
+		7CD975A2BA1D45EE3CFDD121 /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				6089DEF2CAC09F6B56A32287 /* YukimoColor.swift */,
+				CDC3C6869F0B95200308DA6D /* YukimoMotion.swift */,
+				59D1DBA2CCD1E5BB55061EC5 /* YukimoShadow.swift */,
+				D948803988A82E76674EEA9C /* YukimoSpacing.swift */,
+				E85579FE8E40A3C5847A820E /* YukimoTypography.swift */,
+			);
+			name = Theme;
+			path = Theme;
+			sourceTree = "<group>";
+		};
+		7EFEFBF6303C96CDE18ABEBF /* App */ = {
+			isa = PBXGroup;
+			children = (
+				BF39612737EC09B2801C6F69 /* YukimoAppState.swift */,
+				41A21FFA5687985A7009B789 /* YukimoHostFactory.swift */,
+				9D13278B93B2C5CD57929D74 /* YukimoRootView.swift */,
+				C9BB3DA5487556FBED14A63D /* YukimoRoute.swift */,
+				60BF2752DFC14A2469C1BA9A /* YukimoOrientationLock.swift */,
+			);
+			name = App;
+			path = App;
+			sourceTree = "<group>";
+		};
+		7F172D5724120561FE11454D /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				4772EE8476CCB39A2EA063EE /* ForgotPassword */,
+				BD1730E673F421FFC82236B6 /* Login */,
+				57210A937525D3B24DC21A65 /* Onboarding */,
+				82A569CB302E49C8F4F243E5 /* Register */,
+				291C1C3F913440C9FBA00590 /* Shared */,
+				2B8623314B8767C2109E5002 /* Splash */,
+				841CF81BB5E6A8F5875E6DF2 /* Success */,
+				91A25607C79FD3C666B4986E /* Verification */,
+			);
+			name = Auth;
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		82A569CB302E49C8F4F243E5 /* Register */ = {
+			isa = PBXGroup;
+			children = (
+				01B4395616F12EBC9260CCA1 /* RegisterView.swift */,
+				02EF34FD7700C14D8D282B2A /* RegisterViewModel.swift */,
+			);
+			name = Register;
+			path = Register;
+			sourceTree = "<group>";
+		};
+		841CF81BB5E6A8F5875E6DF2 /* Success */ = {
+			isa = PBXGroup;
+			children = (
+				B53D722DA1EC9A83CCD37D14 /* AuthSuccessView.swift */,
+			);
+			name = Success;
+			path = Success;
+			sourceTree = "<group>";
+		};
+		91A25607C79FD3C666B4986E /* Verification */ = {
+			isa = PBXGroup;
+			children = (
+				A2B5208034B1299150830AD8 /* VerificationView.swift */,
+				7F7BB8D1C756CC4A0AFFF08B /* VerificationViewModel.swift */,
+			);
+			name = Verification;
+			path = Verification;
+			sourceTree = "<group>";
+		};
+		93B89B9C26468915BFC1EA8B /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				B1856BAB5CD310705F6FAC27 /* YukimoAsyncImage.swift */,
+			);
+			name = Networking;
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		98CE264FE28A6DCD7F99BC28 /* Player */ = {
+			isa = PBXGroup;
+			children = (
+				292B345ACBCEA735D5219F64 /* YukimoPlayerView.swift */,
+				BE641936A7776D1A7941D651 /* PlayerLayerHost.swift */,
+				527F527CED6D63ADDEEB12DD /* YukimoPlayerModel.swift */,
+				EAA22DFCD956A23F78BF4C9C /* YukimoScrubber.swift */,
+				03A9EA4DAF7B11A9AB462CC5 /* YukimoProgressStore.swift */,
+				2C704019BB08F58187A7F77B /* YukimoWatchedStore.swift */,
+				3C828F8AB0A35DAAC8330F1D /* YukimoHistoryStore.swift */,
+				84C8C26F1894E3BE22C6FC30 /* YukimoUnwatchedStore.swift */,
+				DD53C61A4AF570C469094EE7 /* YukimoPlayerPrefsStore.swift */,
+			);
+			name = Player;
+			path = Player;
+			sourceTree = "<group>";
+		};
+		9FC9C4ED59AB227F96386BA5 /* Bridge */ = {
+			isa = PBXGroup;
+			children = (
+				4F9BDC5CD3610A863FB100DC /* Yukimo-Bridging-Header.h */,
+				C041919F520F25215584EBE2 /* YukimoAuthBridge.h */,
+				E3B6885E1B7350F1951AE326 /* YukimoAuthBridge.mm */,
+				B6250FBDA08C8CC1F278750A /* YukimoSessionBridge.h */,
+				C6E73A00A5EE4162CE2A4FF5 /* YukimoSessionBridge.mm */,
+				DACC80A8E1E1CB4332EA44E2 /* YukimoSettingsBridge.h */,
+				5C0371A65727C0345321C94F /* YukimoSettingsBridge.mm */,
+				07DDC7742BB7E83D8322AE2E /* YukimoHomeBridge.h */,
+				641FA5BA5B49D5C19E05AFED /* YukimoHomeBridge.mm */,
+				0D19A14BB475822119A734AD /* YukimoProfileBridge.h */,
+				B5FFC55718196C255B674A3A /* YukimoProfileBridge.mm */,
+				A33F78C5E1F147FDE6EF51C6 /* YukimoProfileDTO.h */,
+				6BB3135580837A5EC51FF587 /* YukimoProfileDTO.mm */,
+				0EB6788A2C5D9956895E56C3 /* YukimoReleaseDTO.h */,
+				CD30291A48674AC3A5E432F9 /* YukimoReleaseDTO.mm */,
+				E4992ABF696E6B46B0E2BAB2 /* YukimoEpisodeDTO.h */,
+				66D58217B6A4CBDCFD2056F8 /* YukimoEpisodeDTO.mm */,
+				2CB638D23BB7B0929FC43EE0 /* YukimoLibraryBridge.h */,
+				2BD29FFC5F056616F403EF6A /* YukimoLibraryBridge.mm */,
+				F54A5E8084CC88DE219EB4A0 /* YukimoListStatus.h */,
+				55495870498A5B097FC1B352 /* YukimoReleaseDetailBridge.h */,
+				95F0A5F3F9D9C817ECE5AAD7 /* YukimoReleaseDetailBridge.mm */,
+				DC074E3DD8FD97A187BA0042 /* YukimoSearchBridge.h */,
+				E4D8BF113A69DA5963A82969 /* YukimoSearchBridge.mm */,
+				D636A72C1B287B63B30FA2E5 /* YukimoPlayerBridge.h */,
+				F3494CFCDD48FFF5F1568EF9 /* YukimoPlayerBridge.mm */,
+				D59D8D826EF23F9B1E51F3DE /* YukimoStreamDTO.h */,
+				6DED392C11129D3C8C3E1513 /* YukimoStreamDTO.mm */,
+				16278DC1D4FE81920C8E546E /* YukimoSearchFilter.h */,
+				DE4EE5989AA89844AEC66960 /* YukimoSearchFilter.mm */,
+				C8CF717B9B01CF69D133B32E /* Parsers */,
+			);
+			name = Bridge;
+			path = Bridge;
+			sourceTree = "<group>";
+		};
+		A57BE332655A2B4864DB8826 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				7F172D5724120561FE11454D /* Auth */,
+				B7813A0C8170906B847AA681 /* Main */,
+			);
+			name = Features;
+			path = Features;
+			sourceTree = "<group>";
+		};
+		ACEF853EA4EF00AB9CE6FA61 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				2DF9C699ACB3196AC261252A /* Components */,
+				0AD2550A89382A69117C3116 /* HomeView.swift */,
+				CA3ADF05C7E24507D0F44783 /* HomeViewModel.swift */,
+			);
+			name = Home;
+			path = Home;
+			sourceTree = "<group>";
+		};
+		B7813A0C8170906B847AA681 /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				3B674988806E765A7A0665EC /* MainPlaceholderView.swift */,
+				ACEF853EA4EF00AB9CE6FA61 /* Home */,
+				D50C38491D77AF402B6C90D1 /* Tabs */,
+				3950BCF03AB616D9CE15EA61 /* YukimoMainTabView.swift */,
+				D9C1859C0B34278566176F38 /* Details */,
+				DBA5382DD07F3F9DF4A1F5C1 /* Library */,
+				69160594A2F92FD29AD4BB51 /* Search */,
+				98CE264FE28A6DCD7F99BC28 /* Player */,
+				CB10261B9415BD9D5C23299C /* Settings */,
+				1DED7D6623D9095C5B26CB4B /* Downloads */,
+			);
+			name = Main;
+			path = Main;
+			sourceTree = "<group>";
+		};
+		BD1730E673F421FFC82236B6 /* Login */ = {
+			isa = PBXGroup;
+			children = (
+				D825385CE7B7885D4ADA052D /* LoginView.swift */,
+				C4188AA0E8B66AFA5B2DDCAD /* LoginViewModel.swift */,
+			);
+			name = Login;
+			path = Login;
+			sourceTree = "<group>";
+		};
+		C8CF717B9B01CF69D133B32E /* Parsers */ = {
+			isa = PBXGroup;
+			children = (
+				1D7D8A1953C96D2FAACCF93D /* YukimoVKParser.h */,
+				98570450130AD43BB1787B53 /* YukimoVKParser.mm */,
+				B9E1BB15C26683E609C29EA8 /* YukimoSibnetParser.h */,
+				BD3C192BC0795047E9F741BA /* YukimoSibnetParser.mm */,
+			);
+			name = Parsers;
+			path = Parsers;
+			sourceTree = "<group>";
+		};
+		CB10261B9415BD9D5C23299C /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				7FED3E5C0D3C55ED8F235133 /* SettingsView.swift */,
+				A871C23A791D97FE9978EC62 /* YukimoNotificationsManager.swift */,
+			);
+			name = Settings;
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		D50C38491D77AF402B6C90D1 /* Tabs */ = {
+			isa = PBXGroup;
+			children = (
+				828B8B0CCF016BA7C80EE14D /* PlaceholderTabView.swift */,
+				3825CA814076EC0B83DD85AD /* ProfileTabView.swift */,
+				D321EF597775F78598E4A263 /* ProfileDistributionChart.swift */,
+			);
+			name = Tabs;
+			path = Tabs;
+			sourceTree = "<group>";
+		};
+		D9C1859C0B34278566176F38 /* Details */ = {
+			isa = PBXGroup;
+			children = (
+				DA99E54E2AAC68256A161A39 /* AnimeDetailsView.swift */,
+				464176FC48F407C8CC3D3828 /* AnimeDetailsViewModel.swift */,
+				1171249C768A73F3D3C07D64 /* Components */,
+				5B7E9DDA155CC78DE555E81F /* YukimoDetailsCache.swift */,
+			);
+			name = Details;
+			path = Details;
+			sourceTree = "<group>";
+		};
+		DBA5382DD07F3F9DF4A1F5C1 /* Library */ = {
+			isa = PBXGroup;
+			children = (
+				A39D7F08BDECB2E6F6966C69 /* LibraryTabView.swift */,
+			);
+			name = Library;
+			path = Library;
+			sourceTree = "<group>";
+		};
+		E5A4A1861C1D482013486CFF /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				5F949781611E3F21D01D558F /* YukimoCodeInput.swift */,
+				4B09877FBF8377451DE22724 /* YukimoErrorBanner.swift */,
+				AFD3A0795E78929AF6949F50 /* YukimoGlassCard.swift */,
+				184AED8A52B806F6D709E715 /* YukimoGradientBackground.swift */,
+				7E3C03AEB19088A4D1E9868B /* YukimoIcon.swift */,
+				1A545098CBBFB845CFA8B624 /* YukimoLoadingOverlay.swift */,
+				BFC07A3F8B37D4B40C4AAB2C /* YukimoPageIndicator.swift */,
+				3A4C3F0FE2DBE96ACCACABB1 /* YukimoPrimaryButton.swift */,
+				E0A86C8CAFD8F1C09CD9F0D1 /* YukimoTextField.swift */,
+				1FF0FAB94069BEFADD0A42E1 /* YukimoFlowLayout.swift */,
+			);
+			name = Components;
+			path = Components;
+			sourceTree = "<group>";
+		};
 		EF2330622DAD9171008B0A2A /* Comments */ = {
 			isa = PBXGroup;
 			children = (
@@ -1537,6 +2172,10 @@
 				EF15C91F2DF75B3A00335578 /* DataReloadable.h */,
 				EF4941032C72383500832A6C /* AppColor.h */,
 				EF4941052C7238B700832A6C /* AppColor.mm */,
+				BBAA29588C66B020231A679F /* AppMaterial.h */,
+				D1A73EDA98EFB80C43EB7340 /* AppMaterial.mm */,
+				0B826874D0FF7CE19A7C1DD2 /* AppHaptics.h */,
+				96E309EA9857F4678C5020E4 /* AppHaptics.mm */,
 			);
 			path = Misc;
 			sourceTree = "<group>";
@@ -3465,6 +4104,7 @@
 				EF44D0CE2CD6A36800C8B608 /* Main */,
 				EF60AC7E2C6FB30100CD33A8 /* Assets.xcassets */,
 				EF60AC832C6FB30100CD33A8 /* Info.plist */,
+				5541EA5F95B54FE741E4A294 /* Yukimo */,
 			);
 			path = AniAnglia;
 			sourceTree = "<group>";
@@ -3512,6 +4152,20 @@
 				EF928F382DFCAACB00A5CD85 /* StarsVoteView.m */,
 				EFA7322D2DFE259600FBC12C /* NamedSectionsStackView.h */,
 				EFA7322E2DFE25A900FBC12C /* NamedSectionsStackView.mm */,
+				2D67567B11DE1107778230BE /* RatingBadge.h */,
+				51271BC5183DB215610ED32D /* RatingBadge.mm */,
+				8BAE0DDB583845B00A64E826 /* WatchStatusPill.h */,
+				4EC8B4ED531CBC48DC312B5A /* WatchStatusPill.mm */,
+				55039A4852A6D0F79EAC5A71 /* FilterChip.h */,
+				A9B011069459DFFE4BDFF506 /* FilterChip.mm */,
+				055689CF4D3588E057D508A7 /* EmptyStateView.h */,
+				39C66DA7858E7D135BD43EB8 /* EmptyStateView.mm */,
+				493C3DD9C4B6FA2AA1885A1C /* LoadingSkeletonView.h */,
+				50CB793358D1E3EAD05753CC /* LoadingSkeletonView.mm */,
+				922AC563718C4DE589C1AB07 /* AuthChrome.h */,
+				0F3675C3B6D5C158D6D587AD /* AuthChrome.mm */,
+				D819CC21BA3CFBB38C598B4A /* AppBackdrop.h */,
+				77009ED3F635CBB541DD24D2 /* AppBackdrop.mm */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -3626,6 +4280,18 @@
 				EFF6D03E2DFF75370014FFEB /* ReleasesPopularPageViewController.mm */,
 			);
 			path = Releases;
+			sourceTree = "<group>";
+		};
+		FB08B775DC0387D4CF6C047C /* DesignSystem */ = {
+			isa = PBXGroup;
+			children = (
+				E5A4A1861C1D482013486CFF /* Components */,
+				667400DE45A9C7945225FA2D /* Modifiers */,
+				7CD975A2BA1D45EE3CFDD121 /* Theme */,
+				93B89B9C26468915BFC1EA8B /* Networking */,
+			);
+			name = DesignSystem;
+			path = DesignSystem;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -3767,6 +4433,123 @@
 				EFA7322F2DFE25A900FBC12C /* NamedSectionsStackView.mm in Sources */,
 				EF8B01B52C7015A300423ECD /* AuthViewController.mm in Sources */,
 				EF17A2E62DB6B259003429FC /* ProfilesPageableDataProvider.mm in Sources */,
+				FD85532273459E4393C53375 /* AppMaterial.h in Sources */,
+				D0940D19B030B29B1717506A /* AppMaterial.mm in Sources */,
+				A955A749747C2E269FF48036 /* AppHaptics.h in Sources */,
+				ABF38C64BDAE1358DF0EA6DB /* AppHaptics.mm in Sources */,
+				386513DC4F9F81EAFFDC21B0 /* RatingBadge.h in Sources */,
+				01DBEB2CD3E31273AEA4A072 /* RatingBadge.mm in Sources */,
+				E587BAF63F00E2084107726D /* WatchStatusPill.h in Sources */,
+				1D230752B42C515F6F950401 /* WatchStatusPill.mm in Sources */,
+				E1BB807BF763D3F199AC14E0 /* FilterChip.h in Sources */,
+				A5C10CCE1EF39226B4FD1F0C /* FilterChip.mm in Sources */,
+				B8ADBCF615B02BDEFA30828F /* EmptyStateView.h in Sources */,
+				E2FE8E9C826AFCE824CFE919 /* EmptyStateView.mm in Sources */,
+				027BE8F58E73D04EE1BEE65A /* LoadingSkeletonView.h in Sources */,
+				4E4018D6A1E96FC6AAAD17F0 /* LoadingSkeletonView.mm in Sources */,
+				9DE542B8FD23A8EBCA8E65FE /* AuthChrome.h in Sources */,
+				778B396A32EB9042B0EDED7A /* AuthChrome.mm in Sources */,
+				A802C93D6A2A81147A371AF4 /* AppBackdrop.h in Sources */,
+				70E7677C6AAAA12BFDAB48B9 /* AppBackdrop.mm in Sources */,
+				4638158097F0045E626CAE13 /* YukimoAppState.swift in Sources */,
+				F9D0F2B08089C89D0FABFDC6 /* YukimoHostFactory.swift in Sources */,
+				DA878D5C17906469CFEEE8E8 /* YukimoRootView.swift in Sources */,
+				007BB55FE50D956BB272BFF9 /* YukimoRoute.swift in Sources */,
+				7B52C0027E57235DBBA3F47A /* YukimoAuthBridge.mm in Sources */,
+				4FCB25E9B96B35101585BE2D /* YukimoSessionBridge.mm in Sources */,
+				2060259FBE7A8A281F1AE174 /* YukimoSettingsBridge.mm in Sources */,
+				1725FE4CA3018291D3CC435C /* YukimoCodeInput.swift in Sources */,
+				E8A7190D0FA88EF1E5C6A23B /* YukimoErrorBanner.swift in Sources */,
+				82F3F075B6AD288ED92AC337 /* YukimoGlassCard.swift in Sources */,
+				F08BCAE87A4B3347D3EBE2B9 /* YukimoGradientBackground.swift in Sources */,
+				7A1FF63401E415A4EDA35C15 /* YukimoIcon.swift in Sources */,
+				DB5D6513563890D8B555B8A5 /* YukimoLoadingOverlay.swift in Sources */,
+				3681BD0197CA89D99A129B97 /* YukimoPageIndicator.swift in Sources */,
+				1C1375DEA3FFB44F8666FDD7 /* YukimoPrimaryButton.swift in Sources */,
+				720B100EA43EC44405BD2CE4 /* YukimoTextField.swift in Sources */,
+				23AC3E73EC295AAB3A13BE4E /* GlassBackground.swift in Sources */,
+				9F5B29F38C32F1316BBFB8A7 /* YukimoColor.swift in Sources */,
+				48736717FE190C5C5811C69F /* YukimoMotion.swift in Sources */,
+				7DD8CE1B633D100C642833D4 /* YukimoShadow.swift in Sources */,
+				68882774CA8E0F2063D9CA36 /* YukimoSpacing.swift in Sources */,
+				4CE50259E55E56F0FB5A98FE /* YukimoTypography.swift in Sources */,
+				B1317C11AC0A56977A1D0010 /* ForgotPasswordView.swift in Sources */,
+				4E69AE338DB2649E7F16214C /* ForgotPasswordViewModel.swift in Sources */,
+				BD7A1162FB5CE25122BED727 /* LoginView.swift in Sources */,
+				03DB024942D6541F4F6FBA55 /* LoginViewModel.swift in Sources */,
+				CC2715E9A8362E51E2BFC365 /* OnboardingView.swift in Sources */,
+				92631E23DF26347CB769EC42 /* RegisterView.swift in Sources */,
+				05DCFBD9ED73C431E1D7AF44 /* RegisterViewModel.swift in Sources */,
+				DD7C8B6A4D63A345D4856EB3 /* AuthError.swift in Sources */,
+				BC4BE963C4A83F525962407C /* AuthValidator.swift in Sources */,
+				A9BE28977DD17B339F0B15A2 /* SplashView.swift in Sources */,
+				D6FB8397B32950ABA240E6FA /* AuthSuccessView.swift in Sources */,
+				938E02A6A2A825C26D3FDAC2 /* VerificationView.swift in Sources */,
+				A9F5D2B85A77E86178E0ADE2 /* VerificationViewModel.swift in Sources */,
+				BF793FE12D7C25952F671CCB /* MainPlaceholderView.swift in Sources */,
+				3F2731B61C724D46DEC3D5F9 /* YukimoHomeBridge.mm in Sources */,
+				8C025FF989316772BFA92F96 /* YukimoProfileBridge.mm in Sources */,
+				B6677B1784DF38BF10192195 /* YukimoProfileDTO.mm in Sources */,
+				A3A49A708B71A6AF694B2172 /* YukimoReleaseDTO.mm in Sources */,
+				12DEB947FBDEF14874E256DE /* YukimoAsyncImage.swift in Sources */,
+				E6896199C49280B6A01F8C3C /* ContinueWatchingCard.swift in Sources */,
+				2782D0AF5E4E08C7BB2C7B57 /* HeroCard.swift in Sources */,
+				15852359CEE72E8160830B15 /* PosterCard.swift in Sources */,
+				07070BC5457AD8D6859400D4 /* PosterRail.swift in Sources */,
+				5CB23F108842D3A41719044E /* HomeView.swift in Sources */,
+				50DC80C651C747DDD22D33EA /* HomeViewModel.swift in Sources */,
+				B4620933D43ED38B00198ABB /* PlaceholderTabView.swift in Sources */,
+				CE5C4A3A7DB55D3B8C7247F3 /* ProfileTabView.swift in Sources */,
+				8C54C04D6FC4F5A4DD031BA8 /* YukimoMainTabView.swift in Sources */,
+				DDE536C8A05547038DFE45AD /* YukimoEpisodeDTO.mm in Sources */,
+				3E011C3B736B24582A33623F /* YukimoLibraryBridge.mm in Sources */,
+				6BAA317E7B9F86C1890CBD63 /* YukimoReleaseDetailBridge.mm in Sources */,
+				586C5E786A5352A5CF5EF9E8 /* YukimoSearchBridge.mm in Sources */,
+				DB311113C2A162D4C7870B63 /* AnimeDetailsView.swift in Sources */,
+				6D4342D426F04E4E0EE4CE9A /* AnimeDetailsViewModel.swift in Sources */,
+				B647C8A7F4F12D834A1E11DE /* LibraryTabView.swift in Sources */,
+				9BFA4DF825396F985596778D /* SearchTabView.swift in Sources */,
+				9064CE75FB69F0B89E90CD7C /* YukimoPlayerBridge.mm in Sources */,
+				25FBE0FAEDFBBE98DE16443F /* YukimoStreamDTO.mm in Sources */,
+				BCA2D979A214B13E254A5DEB /* SourcePickerRow.swift in Sources */,
+				BC303CE02184ACD4584A533A /* ReleaseRowCard.swift in Sources */,
+				C7A00AB4FED0F83EFABFC548 /* YukimoPlayerView.swift in Sources */,
+				E3C141BA3DE920DAFD71C78E /* PlayerLayerHost.swift in Sources */,
+				A487508A81ABF09555592023 /* YukimoPlayerModel.swift in Sources */,
+				D239C9C94E4A00B9315EEB8C /* YukimoScrubber.swift in Sources */,
+				40F2CAB6820301683B3FA21B /* ScreenshotsBlock.swift in Sources */,
+				8977E2FA180F630B74A05BD0 /* YukimoProgressStore.swift in Sources */,
+				3F0C723B68D404EFCB48D81B /* YukimoOrientationLock.swift in Sources */,
+				2DEBE79FA54FA9B9F465D7E9 /* ProfileDistributionChart.swift in Sources */,
+				960DB335F3B3C36ECFE81AE1 /* DetailsActionRow.swift in Sources */,
+				003FC36C27FAF061FBE3C9EC /* RatingSheet.swift in Sources */,
+				F4E63EC0E3070CCF07F07177 /* SynopsisBlock.swift in Sources */,
+				8420A5C4F8C6CCF90B55C451 /* YukimoSearchFilter.mm in Sources */,
+				1B205D9EF295AAF5A8A93F29 /* YukimoFlowLayout.swift in Sources */,
+				3AD81E84BF4710120C54008A /* SearchFiltersSheet.swift in Sources */,
+				553722366B5F0449B3EE5AB8 /* InfoStrip.swift in Sources */,
+				920B85D52E7825967C2367B7 /* LoadFailureState.swift in Sources */,
+				9B0D69CA33B15E8CDE635D8D /* AnimeDetailsToolbar.swift in Sources */,
+				8D0D18033AA0639F2CE0C29D /* AnimeHeroHeader.swift in Sources */,
+				879B1851ED747DC1B6386651 /* AnimeSecondaryActionsRow.swift in Sources */,
+				F4445F326E7A1C87F1B2CC63 /* AnimeWatchButton.swift in Sources */,
+				A213F272AA7B5166E90F6349 /* ContinueWatchingBlock.swift in Sources */,
+				9F8FDD9335C3EC60D216C69B /* DetailsBadge.swift in Sources */,
+				F32653D4A0B46BD247014DFF /* EpisodeRow.swift in Sources */,
+				09A1E3A4F3356D5D83D7DFD0 /* EpisodeSourceSummary.swift in Sources */,
+				D530F1D8E70981DF876A45ED /* EpisodesSection.swift in Sources */,
+				975C83459E73975A34D77C0B /* FullTitleSheet.swift in Sources */,
+				740E7E4C43A91631DC091B13 /* YukimoWatchedStore.swift in Sources */,
+				A174117C2911AFA9C336BD8B /* YukimoVKParser.mm in Sources */,
+				1AC5B3FCF217F929888C8A5A /* YukimoSibnetParser.mm in Sources */,
+				38ADC7195010EF554CE21C9F /* YukimoHistoryStore.swift in Sources */,
+				DAF715E5865705B463081C05 /* YukimoDetailsCache.swift in Sources */,
+				3A599D1F78C04E9368EA5731 /* SettingsView.swift in Sources */,
+				A21C4C6CD310EA4B24630B58 /* YukimoNotificationsManager.swift in Sources */,
+				04D06D5E3331AA6C826F1D19 /* DownloadsView.swift in Sources */,
+				7A8CE4D28430C72ECA9A3AEC /* YukimoDownloadsManager.swift in Sources */,
+				62A11D1C40C2559B3EEB93CF /* YukimoUnwatchedStore.swift in Sources */,
+				7AFC77891672F76BC14CA368 /* YukimoPlayerPrefsStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3920,29 +4703,41 @@
 		EF60AC892C6FB30100CD33A8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = AniAnglia/AniAnglia.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = CH7CVD4PVH;
+				DEFINES_MODULE = NO;
+				DEVELOPMENT_TEAM = CTP9LBZMTM;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AniAnglia/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = yukimo;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = "";
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.10;
 				PRODUCT_BUNDLE_IDENTIFIER = org.aateam.AniAnglia;
+				PRODUCT_MODULE_NAME = AniAnglia;
 				PRODUCT_NAME = AniAngliaXIX;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "AniAnglia/Yukimo/Bridge/Yukimo-Bridging-Header.h";
+				SWIFT_OBJC_INTERFACE_HEADER_NAME = "AniAnglia-Swift.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -3950,29 +4745,40 @@
 		EF60AC8A2C6FB30100CD33A8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = AniAnglia/AniAnglia.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = CH7CVD4PVH;
+				DEFINES_MODULE = NO;
+				DEVELOPMENT_TEAM = CTP9LBZMTM;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AniAnglia/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = yukimo;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = "";
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.10;
 				PRODUCT_BUNDLE_IDENTIFIER = org.aateam.AniAnglia;
+				PRODUCT_MODULE_NAME = AniAnglia;
 				PRODUCT_NAME = AniAngliaXIX;
+				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "AniAnglia/Yukimo/Bridge/Yukimo-Bridging-Header.h";
+				SWIFT_OBJC_INTERFACE_HEADER_NAME = "AniAnglia-Swift.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

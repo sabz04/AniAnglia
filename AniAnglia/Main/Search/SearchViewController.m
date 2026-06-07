@@ -42,6 +42,8 @@
     _search_bar.delegate = self;
     _search_bar.placeholder = _search_bar_placeholder;
     _search_bar.text = _initial_search_bar_text;
+    _search_bar.searchBarStyle = UISearchBarStyleMinimal;  // native Apple look
+    _search_bar.backgroundImage = [UIImage new];           // kill the residual chrome
     _search_bar.autoresizingMask = UIViewAutoresizingFlexibleHeight;
     _back_bar_button = [[UIBarButtonItem alloc] initWithPrimaryAction:[UIAction actionWithTitle:@"" image:[UIImage systemImageNamed:@"chevron.left"] identifier:nil handler:^(UIAction* action){
         [self onBackButtonPressed];

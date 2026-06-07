@@ -1,197 +1,188 @@
 //
-//  SourceSelectViewController.m
-//  iOSAnixart
+//  SourceSelectViewController.mm
 //
-//  Created by Toilettrauma on 30.09.2024.
+//  yukimo redesign: inset-grouped table with a glass-styled banner header
+//  showing the chosen voice-over name. Selection pushes EpisodeSelectVC.
 //
 
 #import "SourceSelectViewController.h"
 #import "LibanixartApi.h"
 #import "AppColor.h"
+#import "AppMaterial.h"
+#import "AppBackdrop.h"
+#import "AppHaptics.h"
 #import "StringCvt.h"
 #import "EpisodeSelectViewController.h"
 #import "LoadableView.h"
 
+#pragma mark - SourceViewCell
+
 @interface SourceViewCell : UITableViewCell
 @property(nonatomic, retain) UILabel* name_label;
-
 +(NSString*)getIndentifier;
-
--(instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuse_identifier;
-
 -(void)setName:(NSString*)name;
 @end
+
+@implementation SourceViewCell
+
++(NSString*)getIndentifier { return @"SourceViewCell"; }
+
+-(instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString*)reuse {
+    self = [super initWithStyle:style reuseIdentifier:reuse];
+    if (!self) return nil;
+    self.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    self.backgroundColor = [AppColorProvider surfaceElevatedColor];
+    self.selectedBackgroundView = ({
+        UIView* v = [UIView new];
+        v.backgroundColor = [AppColorProvider primarySoftColor];
+        v;
+    });
+
+    _name_label = [UILabel new];
+    _name_label.font = [UIFont app_fontForStyle:AppTextStyleBody weight:UIFontWeightSemibold];
+    _name_label.textColor = [AppColorProvider textColor];
+    _name_label.adjustsFontForContentSizeCategory = YES;
+    _name_label.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.contentView addSubview:_name_label];
+    [NSLayoutConstraint activateConstraints:@[
+        [_name_label.topAnchor      constraintEqualToAnchor:self.contentView.topAnchor    constant:AppSpacing12],
+        [_name_label.bottomAnchor   constraintEqualToAnchor:self.contentView.bottomAnchor constant:-AppSpacing12],
+        [_name_label.leadingAnchor  constraintEqualToAnchor:self.contentView.layoutMarginsGuide.leadingAnchor],
+        [_name_label.trailingAnchor constraintEqualToAnchor:self.contentView.layoutMarginsGuide.trailingAnchor],
+    ]];
+    return self;
+}
+
+-(void)setName:(NSString*)name { _name_label.text = name; }
+
+@end
+
+
+#pragma mark - SourceSelectViewController
 
 @interface SourceSelectViewController () {
     anixart::ReleaseID _release_id;
     anixart::EpisodeTypeID _type_id;
     std::vector<anixart::EpisodeSource::Ptr> _sources;
 }
-@property(nonatomic, retain) NSString* type_name;
-@property(nonatomic, retain) LibanixartApi* api_proxy;
-@property(nonatomic, retain) UIView* header_view;
-@property(nonatomic, retain) UILabel* type_name_label;
-@property(nonatomic, retain) UITableView* table_view;
-@property(nonatomic, retain) LoadableView* loadable_view;
-@end
-
-@implementation SourceViewCell
-
-+(NSString*)getIndentifier {
-    return @"SourceViewCell";
-}
--(instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuse_identifier {
-    self = [super initWithStyle:style reuseIdentifier:reuse_identifier];
-    
-    [self setup];
-    [self setupLayout];
-    
-    return self;
-}
--(void)setup {
-    _name_label = [UILabel new];
-    
-    [self.contentView addSubview:_name_label];
-    
-    _name_label.translatesAutoresizingMaskIntoConstraints = NO;
-    [NSLayoutConstraint activateConstraints:@[
-        [_name_label.topAnchor constraintEqualToAnchor:self.contentView.layoutMarginsGuide.topAnchor],
-        [_name_label.leadingAnchor constraintEqualToAnchor:self.contentView.layoutMarginsGuide.leadingAnchor],
-        [_name_label.widthAnchor constraintEqualToAnchor:self.contentView.layoutMarginsGuide.widthAnchor],
-        [_name_label.heightAnchor constraintEqualToAnchor:self.contentView.layoutMarginsGuide.heightAnchor]
-    ]];
-}
--(void)setupLayout {
-    self.backgroundColor = [AppColorProvider backgroundColor];
-    _name_label.textColor = [AppColorProvider textColor];
-}
-
--(void)setName:(NSString*)name {
-    _name_label.text = name;
-}
-
+@property(nonatomic, retain) NSString*       type_name;
+@property(nonatomic, retain) LibanixartApi*  api_proxy;
+@property(nonatomic, retain) UITableView*    table_view;
+@property(nonatomic, retain) LoadableView*   loadable_view;
 @end
 
 @implementation SourceSelectViewController
 
--(instancetype)initWithReleaseID:(anixart::ReleaseID)release_id typeID:(anixart::EpisodeTypeID)type_id typeName:(NSString*)type_name {
+-(instancetype)initWithReleaseID:(anixart::ReleaseID)release_id
+                          typeID:(anixart::EpisodeTypeID)type_id
+                        typeName:(NSString*)type_name {
     self = [super init];
-    
+    if (!self) return nil;
     _release_id = release_id;
-    _type_id = type_id;
-    _type_name = type_name;
-    _api_proxy = [LibanixartApi sharedInstance];
-    
+    _type_id    = type_id;
+    _type_name  = type_name;
+    _api_proxy  = [LibanixartApi sharedInstance];
     return self;
 }
 
 -(void)viewDidLoad {
     [super viewDidLoad];
-    
-    [self preSetup];
-    [self preSetupLayout];
+    self.view.backgroundColor = [AppColorProvider backgroundColor];
+    [AppBackdrop installIn:self.view];
+    self.navigationItem.title = NSLocalizedString(@"app.source_select.nav_item.title", "");
+
+    _loadable_view = [LoadableView new];
+    _loadable_view.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:_loadable_view];
+    [NSLayoutConstraint activateConstraints:@[
+        [_loadable_view.centerYAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.centerYAnchor],
+        [_loadable_view.centerXAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.centerXAnchor],
+    ]];
+
     [self loadSources];
 }
 
--(void)preSetup {
-    self.navigationItem.title = NSLocalizedString(@"app.source_select.nav_item.title", "");
-    
-    _loadable_view = [LoadableView new];
-    
-    [self.view addSubview:_loadable_view];
-    
-    _loadable_view.translatesAutoresizingMaskIntoConstraints = NO;
-    [NSLayoutConstraint activateConstraints:@[
-        [_loadable_view.centerYAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.centerYAnchor],
-        [_loadable_view.centerXAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.centerXAnchor]
-    ]];
-}
-
 -(void)setup {
-    _table_view = [UITableView new];
+    _table_view = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStyleInsetGrouped];
     [_table_view registerClass:SourceViewCell.class forCellReuseIdentifier:[SourceViewCell getIndentifier]];
     _table_view.dataSource = self;
-    _table_view.delegate = self;
-    
-    _type_name_label = [UILabel new];
-    _type_name_label.text = _type_name;
-    _type_name_label.font = [UIFont boldSystemFontOfSize:25];
-    
-    _header_view = [UIView new];
-    
-    [self.view addSubview:_table_view];
-    [_header_view addSubview:_type_name_label];
-    _table_view.tableHeaderView = _header_view;
-    
-    _table_view.translatesAutoresizingMaskIntoConstraints = NO;
-    _header_view.translatesAutoresizingMaskIntoConstraints = NO;
-    _type_name_label.translatesAutoresizingMaskIntoConstraints = NO;
+    _table_view.delegate   = self;
+    _table_view.backgroundColor = UIColor.clearColor;
+    _table_view.estimatedRowHeight = 60;
+    _table_view.rowHeight = UITableViewAutomaticDimension;
+
+    UIView* header = [UIView new];
+
+    UILabel* eyebrow = [UILabel new];
+    eyebrow.text = NSLocalizedString(@"app.type_select.nav_item.title", "");
+    eyebrow.font = [UIFont app_fontForStyle:AppTextStyleCaption1 weight:UIFontWeightSemibold];
+    eyebrow.textColor = [AppColorProvider textTertiaryColor];
+
+    UILabel* title = [UILabel new];
+    title.text = _type_name;
+    title.font = [UIFont app_fontForStyle:AppTextStyleTitle2 weight:UIFontWeightBold];
+    title.textColor = [AppColorProvider textColor];
+    title.numberOfLines = 0;
+
+    UIStackView* stack = [[UIStackView alloc] initWithArrangedSubviews:@[eyebrow, title]];
+    stack.axis = UILayoutConstraintAxisVertical;
+    stack.spacing = AppSpacing4;
+    stack.translatesAutoresizingMaskIntoConstraints = NO;
+    [header addSubview:stack];
     [NSLayoutConstraint activateConstraints:@[
-        [_header_view.topAnchor constraintEqualToAnchor:_table_view.topAnchor],
-        [_header_view.leadingAnchor constraintEqualToAnchor:_table_view.layoutMarginsGuide.leadingAnchor],
-        [_header_view.trailingAnchor constraintEqualToAnchor:_table_view.layoutMarginsGuide.trailingAnchor],
-        [_header_view.heightAnchor constraintEqualToAnchor:_type_name_label.heightAnchor constant:5],
-        
-        [_type_name_label.leadingAnchor constraintEqualToAnchor:_header_view.leadingAnchor],
-        [_type_name_label.trailingAnchor constraintEqualToAnchor:_header_view.trailingAnchor],
-
-        [_table_view.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor],
-        [_table_view.leadingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leadingAnchor],
-        [_table_view.trailingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.trailingAnchor],
-        [_table_view.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor]
+        [stack.topAnchor      constraintEqualToAnchor:header.topAnchor    constant:AppSpacing8],
+        [stack.leadingAnchor  constraintEqualToAnchor:header.layoutMarginsGuide.leadingAnchor],
+        [stack.trailingAnchor constraintEqualToAnchor:header.layoutMarginsGuide.trailingAnchor],
+        [stack.bottomAnchor   constraintEqualToAnchor:header.bottomAnchor constant:-AppSpacing12],
     ]];
-    
-    [_header_view setNeedsLayout];
-    [_header_view layoutIfNeeded];
-    _table_view.tableHeaderView = _header_view;
-}
 
--(void)preSetupLayout {
-    self.view.backgroundColor = [AppColorProvider backgroundColor];
-}
+    [self.view addSubview:_table_view];
+    _table_view.translatesAutoresizingMaskIntoConstraints = NO;
+    [NSLayoutConstraint activateConstraints:@[
+        [_table_view.leadingAnchor  constraintEqualToAnchor:self.view.leadingAnchor],
+        [_table_view.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+        [_table_view.topAnchor      constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor],
+        [_table_view.bottomAnchor   constraintEqualToAnchor:self.view.bottomAnchor],
+    ]];
 
--(void)setupLayout {
-    _table_view.backgroundColor = [AppColorProvider backgroundColor];
-    _type_name_label.textColor = [AppColorProvider textColor];
+    [header setNeedsLayout];
+    [header layoutIfNeeded];
+    CGSize fit = [header systemLayoutSizeFittingSize:UILayoutFittingCompressedSize];
+    header.frame = CGRectMake(0, 0, _table_view.bounds.size.width, fit.height);
+    _table_view.tableHeaderView = header;
 }
 
 -(void)loadSources {
     [_loadable_view startLoading];
-    
     [_api_proxy asyncCall:^BOOL(anixart::Api* api) {
         self->_sources = api->episodes().get_release_sources(self->_release_id, self->_type_id);
         return NO;
     } completion:^(BOOL errored) {
         [self->_loadable_view endLoadingWithErrored:errored];
-        if (!errored) {
-            [self setup];
-        }
+        if (!errored) [self setup];
     }];
 }
 
+-(NSInteger)tableView:(UITableView*)tv numberOfRowsInSection:(NSInteger)s { return _sources.size(); }
 
--(NSInteger)tableView:(UITableView *)table_view numberOfRowsInSection:(NSInteger)section {
-    return _sources.size();
-}
--(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 50;
-}
--(UITableViewCell *)tableView:(UITableView *)table_view cellForRowAtIndexPath:(NSIndexPath *)index_path {
-    SourceViewCell* cell = [table_view dequeueReusableCellWithIdentifier:[SourceViewCell getIndentifier] forIndexPath:index_path];
-    NSInteger index = [index_path item];
-    anixart::EpisodeSource::Ptr& source = _sources[index];
-    
+-(UITableViewCell*)tableView:(UITableView*)tv cellForRowAtIndexPath:(NSIndexPath*)ip {
+    SourceViewCell* cell = [tv dequeueReusableCellWithIdentifier:[SourceViewCell getIndentifier] forIndexPath:ip];
+    anixart::EpisodeSource::Ptr& source = _sources[ip.row];
     [cell setName:TO_NSSTRING(source->name)];
-
     return cell;
 }
 
--(void)tableView:(UITableView *)table_view didSelectRowAtIndexPath:(NSIndexPath *)index_path {
-    [table_view deselectRowAtIndexPath:index_path animated:YES];
-    NSInteger index = [index_path item];
-    anixart::EpisodeSource::Ptr& source = _sources[index];
-    
-    [self.navigationController pushViewController:[[EpisodeSelectViewController alloc] initWithReleaseID:_release_id typeID:_type_id typeName:_type_name sourceID:source->id sourceName:TO_NSSTRING(source->name)] animated:NO];
+-(void)tableView:(UITableView*)tv didSelectRowAtIndexPath:(NSIndexPath*)ip {
+    [tv deselectRowAtIndexPath:ip animated:YES];
+    [AppHaptics impactLight];
+    anixart::EpisodeSource::Ptr& source = _sources[ip.row];
+    EpisodeSelectViewController* next =
+        [[EpisodeSelectViewController alloc] initWithReleaseID:_release_id
+                                                        typeID:_type_id
+                                                      typeName:_type_name
+                                                      sourceID:source->id
+                                                    sourceName:TO_NSSTRING(source->name)];
+    [self.navigationController pushViewController:next animated:NO];
 }
 
 @end

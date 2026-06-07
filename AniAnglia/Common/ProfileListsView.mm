@@ -59,46 +59,47 @@
     return self;
 }
 -(void)setup {
+    // Single horizontal row: small color dot + name on the left, monospaced
+    // count on the right. Clean, scannable, consistent across all 5 statuses.
     _legend_color_view = [UIView new];
-    _legend_color_view.layer.cornerRadius = 5;
-    
+    _legend_color_view.layer.cornerRadius = 4;
+    _legend_color_view.clipsToBounds = YES;
+
     _legend_name_label = [UILabel new];
     _legend_name_label.text = _legend_name;
     _legend_name_label.textAlignment = NSTextAlignmentLeft;
-    
+    _legend_name_label.font = [UIFont app_fontForStyle:AppTextStyleSubheadline weight:UIFontWeightMedium];
+    _legend_name_label.adjustsFontForContentSizeCategory = YES;
+
     _legend_count_label = [UILabel new];
     _legend_count_label.text = [@(_legend_count) stringValue];
     _legend_count_label.textAlignment = NSTextAlignmentRight;
     _legend_count_label.numberOfLines = 1;
-    _legend_count_label.adjustsFontSizeToFitWidth = YES;
-    
+    _legend_count_label.font = [UIFont app_monospacedDigitFontForStyle:AppTextStyleSubheadline weight:UIFontWeightSemibold];
+    _legend_count_label.adjustsFontForContentSizeCategory = YES;
+
     [self addSubview:_legend_color_view];
     [self addSubview:_legend_name_label];
     [self addSubview:_legend_count_label];
-    
+
     _legend_color_view.translatesAutoresizingMaskIntoConstraints = NO;
     _legend_name_label.translatesAutoresizingMaskIntoConstraints = NO;
     _legend_count_label.translatesAutoresizingMaskIntoConstraints = NO;
     [NSLayoutConstraint activateConstraints:@[
-        [_legend_color_view.centerYAnchor constraintEqualToAnchor:self.layoutMarginsGuide.centerYAnchor],
-        [_legend_color_view.leadingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.leadingAnchor],
-        [_legend_color_view.widthAnchor constraintEqualToAnchor:self.layoutMarginsGuide.heightAnchor],
-        [_legend_color_view.heightAnchor constraintEqualToAnchor:self.layoutMarginsGuide.heightAnchor],
-        
-        // TODO: change constraints
-        [_legend_name_label.topAnchor constraintEqualToAnchor:self.layoutMarginsGuide.topAnchor],
-        [_legend_name_label.leadingAnchor constraintEqualToAnchor:_legend_color_view.trailingAnchor constant:5],
-//        [_legend_name_label.trailingAnchor constraintLessThanOrEqualToAnchor:self.layoutMarginsGuide.trailingAnchor],
-        [_legend_name_label.bottomAnchor constraintEqualToAnchor:self.layoutMarginsGuide.bottomAnchor],
-        
-        [_legend_count_label.topAnchor constraintEqualToAnchor:self.layoutMarginsGuide.topAnchor],
-//        [_legend_count_label.leadingAnchor constraintGreaterThanOrEqualToAnchor:_legend_color_view.trailingAnchor constant:5],
-        [_legend_count_label.leadingAnchor constraintGreaterThanOrEqualToAnchor:_legend_name_label.trailingAnchor constant:5],
-        [_legend_count_label.trailingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.trailingAnchor],
-        [_legend_count_label.bottomAnchor constraintEqualToAnchor:self.layoutMarginsGuide.bottomAnchor]
+        [_legend_color_view.centerYAnchor constraintEqualToAnchor:self.centerYAnchor],
+        [_legend_color_view.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
+        [_legend_color_view.widthAnchor   constraintEqualToConstant:10],
+        [_legend_color_view.heightAnchor  constraintEqualToConstant:10],
+
+        [_legend_name_label.centerYAnchor  constraintEqualToAnchor:self.centerYAnchor],
+        [_legend_name_label.leadingAnchor  constraintEqualToAnchor:_legend_color_view.trailingAnchor constant:AppSpacing8],
+
+        [_legend_count_label.centerYAnchor  constraintEqualToAnchor:self.centerYAnchor],
+        [_legend_count_label.leadingAnchor  constraintGreaterThanOrEqualToAnchor:_legend_name_label.trailingAnchor constant:AppSpacing8],
+        [_legend_count_label.trailingAnchor constraintEqualToAnchor:self.trailingAnchor],
+
+        [self.heightAnchor constraintGreaterThanOrEqualToConstant:24],
     ]];
-    [_legend_name_label sizeToFit];
-    [_legend_count_label sizeToFit];
 }
 -(void)setupLayout {
     _legend_color_view.backgroundColor = _legend_color;
@@ -117,20 +118,13 @@
 
 +(UIColor*)getColorForListStatus:(anixart::Profile::ListStatus)list_status {
     switch (list_status) {
-        case anixart::Profile::ListStatus::Watching:
-            return [UIColor systemIndigoColor];
-        case anixart::Profile::ListStatus::Plan:
-            return [UIColor systemYellowColor];
-        case anixart::Profile::ListStatus::Watched:
-            return [UIColor systemGreenColor];
-        case anixart::Profile::ListStatus::HoldOn:
-            return [UIColor systemPurpleColor];
-        case anixart::Profile::ListStatus::Dropped:
-            return [UIColor systemRedColor];
-        default:
-            return [UIColor clearColor];
+        case anixart::Profile::ListStatus::Watching: return [AppColorProvider accentMintColor];   // green = actively watching
+        case anixart::Profile::ListStatus::Plan:     return [AppColorProvider accentBlueColor];   // blue = planned
+        case anixart::Profile::ListStatus::Watched:  return [AppColorProvider accentYellowColor]; // yellow = done
+        case anixart::Profile::ListStatus::HoldOn:   return [AppColorProvider secondaryColor];    // purple = on hold
+        case anixart::Profile::ListStatus::Dropped:  return [AppColorProvider primaryColor];      // coral = dropped (brand red)
+        default: return UIColor.clearColor;
     }
-    return [UIColor clearColor];
 }
 
 +(NSString*)getListStatusName:(anixart::Profile::ListStatus)list_status {
@@ -298,12 +292,12 @@
     ]];
 }
 -(void)setupLayout {
-    _total_indicator_view.backgroundColor = [AppColorProvider foregroundColor1];
-    _watching_indicator_view.backgroundColor = [UIColor systemIndigoColor];
-    _plan_indicator_view.backgroundColor = [UIColor systemYellowColor];
-    _watched_indicator_view.backgroundColor = [UIColor systemGreenColor];
-    _holdon_indicator_view.backgroundColor = [UIColor systemPurpleColor];
-    _dropped_indicator_view.backgroundColor = [UIColor systemRedColor];
+    _total_indicator_view.backgroundColor = [AppColorProvider surfaceColor];
+    _watching_indicator_view.backgroundColor = [AppColorProvider accentMintColor];
+    _plan_indicator_view.backgroundColor     = [AppColorProvider accentBlueColor];
+    _watched_indicator_view.backgroundColor  = [AppColorProvider accentYellowColor];
+    _holdon_indicator_view.backgroundColor   = [AppColorProvider secondaryColor];
+    _dropped_indicator_view.backgroundColor  = [AppColorProvider primaryColor];
 }
 
 -(ProfileListLegendView*)makeListLegendWithList:(anixart::Profile::ListStatus)list count:(int64_t)count {

@@ -9,6 +9,7 @@
 #import "CollectionsCollectionViewController.h"
 #import "LoadableView.h"
 #import "AppColor.h"
+#import "AppMaterial.h"
 #import "StringCvt.h"
 #import "CollectionViewController.h"
 
@@ -50,65 +51,60 @@
 
 -(instancetype)init {
     self = [super init];
-
     [self setup];
-    [self setupLayout];
-    
     return self;
 }
 -(instancetype)initWithName:(NSString*)name image:(UIImage*)image settedImage:(UIImage*)setted_image {
     self = [super init];
-    
     _name = name;
     _image = image;
     _setted_image = setted_image;
     [self setup];
-    [self setupLayout];
-    
     return self;
 }
 -(void)setup {
-    self.layer.cornerRadius = 8;
-    
+    self.layer.cornerCurve = kCACornerCurveContinuous;
+    self.layer.masksToBounds = YES;
+
+    // Glass capsule — same material treatment as RatingBadge / WatchStatusPill
+    // so a collection card reads as part of the same design family.
+    [AppMaterial applyGlassToView:self style:AppMaterialStylePill shape:AppMaterialShapeCapsule];
+
     _stack_view = [UIStackView new];
     _stack_view.axis = UILayoutConstraintAxisHorizontal;
-    _stack_view.distribution = UIStackViewDistributionEqualSpacing;
+    _stack_view.distribution = UIStackViewDistributionFill;
     _stack_view.alignment = UIStackViewAlignmentCenter;
-    _stack_view.spacing = 5;
-    
+    _stack_view.spacing = AppSpacing4;
+    _stack_view.userInteractionEnabled = NO;
+
+    _image_view = [[UIImageView alloc] initWithImage:_image];
+    _image_view.contentMode = UIViewContentModeScaleAspectFit;
+    _image_view.preferredSymbolConfiguration =
+        [UIImageSymbolConfiguration configurationWithPointSize:10 weight:UIImageSymbolWeightSemibold];
+
     _name_label = [UILabel new];
     _name_label.text = _name;
-    
-    _image_view = [[UIImageView alloc] initWithImage:_image];
-    
+    _name_label.font = [UIFont app_monospacedDigitFontForStyle:AppTextStyleCaption1 weight:UIFontWeightSemibold];
+    _name_label.textColor = [AppColorProvider textOnGlassColor];
+
     [self setIsSetted:NO];
-    
+
     [self addSubview:_stack_view];
-    [_stack_view addArrangedSubview:_name_label];
     [_stack_view addArrangedSubview:_image_view];
-    
+    [_stack_view addArrangedSubview:_name_label];
+
     _stack_view.translatesAutoresizingMaskIntoConstraints = NO;
-    _name_label.translatesAutoresizingMaskIntoConstraints = NO;
-    _image_view.translatesAutoresizingMaskIntoConstraints = NO;
     [NSLayoutConstraint activateConstraints:@[
-        [_stack_view.topAnchor constraintEqualToAnchor:self.layoutMarginsGuide.topAnchor],
-        [_stack_view.leadingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.leadingAnchor],
-        [_stack_view.trailingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.trailingAnchor],
-        [_stack_view.bottomAnchor constraintEqualToAnchor:self.layoutMarginsGuide.bottomAnchor],
-        
-        [_name_label.heightAnchor constraintEqualToAnchor:self.layoutMarginsGuide.heightAnchor],
-//        [_image_view.heightAnchor constraintEqualToAnchor:self.layoutMarginsGuide.heightAnchor multiplier:0.7],
+        [_stack_view.leadingAnchor  constraintEqualToAnchor:self.leadingAnchor  constant:AppSpacing8],
+        [_stack_view.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-AppSpacing8],
+        [_stack_view.topAnchor      constraintEqualToAnchor:self.topAnchor      constant:AppSpacing4],
+        [_stack_view.bottomAnchor   constraintEqualToAnchor:self.bottomAnchor   constant:-AppSpacing4],
     ]];
-}
--(void)setupLayout {
-    self.backgroundColor = [[AppColorProvider foregroundColor1] colorWithAlphaComponent:0.85];
-    _name_label.textColor = [AppColorProvider textColor];
 }
 
 -(void)setName:(NSString*)name {
     _name = name;
     _name_label.text = name;
-    [_name_label sizeToFit];
 }
 -(void)setImage:(UIImage*)image {
     _image = image;
@@ -117,7 +113,8 @@
 
 -(void)setIsSetted:(BOOL)is_setted {
     _image_view.image = is_setted ? _setted_image : _image;
-    _image_view.tintColor = is_setted ? [AppColorProvider primaryColor] : [AppColorProvider textColor];
+    _image_view.tintColor = is_setted ? [AppColorProvider primaryColor] : [AppColorProvider textOnGlassColor];
+    _name_label.textColor = is_setted ? [AppColorProvider primaryColor] : [AppColorProvider textOnGlassColor];
 }
 
 @end
@@ -130,73 +127,97 @@
 
 -(instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
-    
+    if (!self) return nil;
     [self setup];
-    [self setupLayout];
-    
     return self;
 }
+
+// Layout: 16:9 cover image, bottom-up dark scrim, title sits over the scrim
+// with a soft shadow for legibility on busy art. Two glass badges (comments,
+// bookmarks) anchor top-right.
 -(void)setup {
     self.clipsToBounds = YES;
-    self.layer.cornerRadius = 8;
-    
+    self.layer.cornerRadius = AppRadiusLarge;
+    self.layer.cornerCurve = kCACornerCurveContinuous;
+    self.backgroundColor = [AppColorProvider posterPlaceholderColor];
+
     _image_view = [LoadableImageView new];
     _image_view.contentMode = UIViewContentModeScaleAspectFill;
-    
+    _image_view.clipsToBounds = YES;
+    _image_view.translatesAutoresizingMaskIntoConstraints = NO;
+
+    UIView* scrim = [UIView new];
+    scrim.translatesAutoresizingMaskIntoConstraints = NO;
+    scrim.userInteractionEnabled = NO;
+    _gradient_layer = [CAGradientLayer layer];
+    _gradient_layer.colors = @[
+        (id)[UIColor colorWithWhite:0.0 alpha:0.0].CGColor,
+        (id)[UIColor colorWithWhite:0.0 alpha:0.65].CGColor,
+        (id)[UIColor colorWithWhite:0.0 alpha:0.90].CGColor,
+    ];
+    _gradient_layer.locations = @[@0.0, @0.5, @1.0];
+    [scrim.layer addSublayer:_gradient_layer];
+
     _title_label = [UILabel new];
     _title_label.numberOfLines = 2;
-    _title_label.font = [UIFont systemFontOfSize:24];
-    
-    _comment_count_badge = [[CollectionInfoBadge alloc] initWithName:nil image:[UIImage systemImageNamed:@"message"] settedImage:[UIImage systemImageNamed:@"message.fill"]];
-    _comment_count_badge.layoutMargins = UIEdgeInsetsMake(5, 8, 5, 8);
-    
-    _bookmark_count_badge = [[CollectionInfoBadge alloc] initWithName:nil image:[UIImage systemImageNamed:@"bookmark"] settedImage:[UIImage systemImageNamed:@"bookmark.fill"]];
-    _bookmark_count_badge.layoutMargins = UIEdgeInsetsMake(5, 8, 5, 8);
-    
-    _gradient_layer = [CAGradientLayer layer];
-    _gradient_layer.startPoint = CGPointMake(0, 0.3);
-    _gradient_layer.endPoint = CGPointMake(0, 1);
-    
-    [self.layer addSublayer:_gradient_layer];
-    self.backgroundView = _image_view;
-    [self addSubview:_title_label];
-    [self addSubview:_comment_count_badge];
-    [self addSubview:_bookmark_count_badge];
-    
+    _title_label.font = [UIFont app_fontForStyle:AppTextStyleHeadline weight:UIFontWeightBold];
+    _title_label.textColor = UIColor.whiteColor;
+    _title_label.adjustsFontForContentSizeCategory = YES;
+    _title_label.layer.shadowColor   = UIColor.blackColor.CGColor;
+    _title_label.layer.shadowOpacity = 0.75;
+    _title_label.layer.shadowRadius  = 6;
+    _title_label.layer.shadowOffset  = CGSizeMake(0, 1);
     _title_label.translatesAutoresizingMaskIntoConstraints = NO;
+
+    _comment_count_badge = [[CollectionInfoBadge alloc]
+        initWithName:nil
+               image:[UIImage systemImageNamed:@"message"]
+         settedImage:[UIImage systemImageNamed:@"message.fill"]];
     _comment_count_badge.translatesAutoresizingMaskIntoConstraints = NO;
+
+    _bookmark_count_badge = [[CollectionInfoBadge alloc]
+        initWithName:nil
+               image:[UIImage systemImageNamed:@"bookmark"]
+         settedImage:[UIImage systemImageNamed:@"bookmark.fill"]];
     _bookmark_count_badge.translatesAutoresizingMaskIntoConstraints = NO;
+
+    [self.contentView addSubview:_image_view];
+    [self.contentView addSubview:scrim];
+    [self.contentView addSubview:_title_label];
+    [self.contentView addSubview:_comment_count_badge];
+    [self.contentView addSubview:_bookmark_count_badge];
+
     [NSLayoutConstraint activateConstraints:@[
-        [_title_label.topAnchor constraintGreaterThanOrEqualToAnchor:self.layoutMarginsGuide.topAnchor],
-        [_title_label.leadingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.leadingAnchor],
-        [_title_label.trailingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.trailingAnchor],
-        [_title_label.bottomAnchor constraintEqualToAnchor:self.layoutMarginsGuide.bottomAnchor],
-        
-        [_comment_count_badge.topAnchor constraintEqualToAnchor:self.layoutMarginsGuide.topAnchor],
-        [_comment_count_badge.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.layoutMarginsGuide.leadingAnchor],
-        [_comment_count_badge.heightAnchor constraintEqualToConstant:30],
-        [_comment_count_badge.bottomAnchor constraintLessThanOrEqualToAnchor:self.layoutMarginsGuide.bottomAnchor],
-        
-        [_bookmark_count_badge.topAnchor constraintEqualToAnchor:self.layoutMarginsGuide.topAnchor],
-        [_bookmark_count_badge.leadingAnchor constraintGreaterThanOrEqualToAnchor:_comment_count_badge.trailingAnchor constant:10],
-        [_bookmark_count_badge.heightAnchor constraintEqualToConstant:30],
-        [_bookmark_count_badge.trailingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.trailingAnchor],
-        [_bookmark_count_badge.bottomAnchor constraintLessThanOrEqualToAnchor:self.layoutMarginsGuide.bottomAnchor]
+        [_image_view.topAnchor      constraintEqualToAnchor:self.contentView.topAnchor],
+        [_image_view.leadingAnchor  constraintEqualToAnchor:self.contentView.leadingAnchor],
+        [_image_view.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor],
+        [_image_view.bottomAnchor   constraintEqualToAnchor:self.contentView.bottomAnchor],
+
+        [scrim.leadingAnchor  constraintEqualToAnchor:self.contentView.leadingAnchor],
+        [scrim.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor],
+        [scrim.bottomAnchor   constraintEqualToAnchor:self.contentView.bottomAnchor],
+        [scrim.heightAnchor   constraintEqualToAnchor:self.contentView.heightAnchor multiplier:0.65],
+
+        [_title_label.leadingAnchor  constraintEqualToAnchor:self.contentView.leadingAnchor  constant:AppSpacing16],
+        [_title_label.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor constant:-AppSpacing16],
+        [_title_label.bottomAnchor   constraintEqualToAnchor:self.contentView.bottomAnchor   constant:-AppSpacing16],
+
+        [_comment_count_badge.topAnchor      constraintEqualToAnchor:self.contentView.topAnchor      constant:AppSpacing12],
+        [_comment_count_badge.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor constant:-AppSpacing12],
+
+        [_bookmark_count_badge.topAnchor      constraintEqualToAnchor:_comment_count_badge.bottomAnchor constant:AppSpacing6],
+        [_bookmark_count_badge.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor   constant:-AppSpacing12],
     ]];
-    
-}
--(void)setupLayout {
-    self.backgroundColor = [AppColorProvider foregroundColor1];
-    _gradient_layer.colors = @[(id)[UIColor clearColor].CGColor, (id)[AppColorProvider backgroundColor].CGColor];
-    _title_label.textColor = [AppColorProvider textColor];
 }
 
 -(void)layoutSubviews {
     [super layoutSubviews];
-    _gradient_layer.frame = self.bounds;
-}
--(void)traitCollectionDidChange:(UITraitCollection *)previous_trait_collection {
-    _gradient_layer.colors = @[(id)[UIColor clearColor].CGColor, (id)[AppColorProvider backgroundColor].CGColor];
+    for (UIView* sub in self.contentView.subviews) {
+        if (sub.layer.sublayers.count > 0
+            && [sub.layer.sublayers.firstObject isKindOfClass:CAGradientLayer.class]) {
+            sub.layer.sublayers.firstObject.frame = sub.bounds;
+        }
+    }
 }
 
 -(void)setImageUrl:(NSURL*)image_url {

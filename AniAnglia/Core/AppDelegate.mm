@@ -9,6 +9,7 @@
 #import "AppDataController.h"
 #import "LibanixartApi.h"
 #import "StringCvt.h"
+#import "AniAnglia-Swift.h"
 
 #import <AVFoundation/AVFoundation.h>
 
@@ -44,6 +45,16 @@
     // Called when the user discards a scene session.
     // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
     // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
+}
+
+#pragma mark - Orientation gate
+
+// The whole app is locked to portrait by default. The player flips this to
+// landscape on appear and back to portrait on disappear via
+// YukimoOrientationLock.shared.
+- (UIInterfaceOrientationMask)application:(UIApplication *)application
+   supportedInterfaceOrientationsForWindow:(UIWindow *)window {
+    return [YukimoOrientationLock shared].allowed;
 }
 
 

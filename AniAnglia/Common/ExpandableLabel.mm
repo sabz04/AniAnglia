@@ -31,10 +31,16 @@
 -(void)setup {
     _text_label = [UILabel new];
     _text_label.numberOfLines = _number_of_lines;
-    _text_label.textAlignment = NSTextAlignmentJustified;
-    
+    // Left-aligned — justified text in Cyrillic produces awkward word-spacing
+    // because of unequal word lengths.
+    _text_label.textAlignment = NSTextAlignmentLeft;
+    _text_label.font = [UIFont app_fontForStyle:AppTextStyleSubheadline];
+    _text_label.adjustsFontForContentSizeCategory = YES;
+    _text_label.lineBreakMode = NSLineBreakByWordWrapping;
+
     _show_all_button = [UIButton new];
     [_show_all_button setTitle:NSLocalizedString(@"app.common.expandable_label.show_all.title", "") forState:UIControlStateNormal];
+    _show_all_button.titleLabel.font = [UIFont app_fontForStyle:AppTextStyleSubheadline weight:UIFontWeightSemibold];
     [_show_all_button addTarget:self action:@selector(onShowAllButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     
     [self addSubview:_text_label];

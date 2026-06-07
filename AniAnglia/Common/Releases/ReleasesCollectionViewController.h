@@ -26,6 +26,9 @@
 // Always automatically sets delegate for "PageableDataProviderDelegate"
 @interface ReleasesCollectionViewController : UIViewController <PageableDataProviderDelegate>
 @property(nonatomic) BOOL is_container_view_controller;
+/// Fires exactly once, after the first page load completes. Useful for parent
+/// screens that want to hide a rail entirely when the result set is empty.
+@property(nonatomic, copy, nullable) void (^onDidLoadFirstPage)(NSInteger count);
 
 -(instancetype)initWithAxis:(UICollectionViewScrollDirection)axis;
 -(instancetype)initWithPages:(anixart::Pageable<anixart::Release>::UPtr)pages axis:(UICollectionViewScrollDirection)axis;

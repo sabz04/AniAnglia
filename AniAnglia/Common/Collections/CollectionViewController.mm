@@ -8,6 +8,9 @@
 #import <Foundation/Foundation.h>
 #import "CollectionViewController.h"
 #import "AppColor.h"
+#import "AppMaterial.h"
+#import "AppBackdrop.h"
+#import "AppHaptics.h"
 #import "StringCvt.h"
 #import "ReleasesTableViewController.h"
 #import "LoadableView.h"
@@ -123,48 +126,65 @@
 }
 
 -(void)setup {
+    // Compact author row: 40pt circular avatar + eyebrow ("Автор") above the
+    // username — Apple Music / Letterboxd convention. Whole row is tappable
+    // and pushes the author's profile.
     _avatar_button = [UIButton new];
     [_avatar_button addTarget:self action:@selector(onAvatarPressed:) forControlEvents:UIControlEventTouchUpInside];
     _avatar_button.clipsToBounds = YES;
-    _avatar_button.layer.cornerRadius = 25;
-    
+    _avatar_button.layer.cornerRadius = 20;
+    _avatar_button.translatesAutoresizingMaskIntoConstraints = NO;
+
     _avatar_view = [LoadableImageView new];
     _avatar_view.contentMode = UIViewContentModeScaleAspectFill;
-    
+    _avatar_view.userInteractionEnabled = NO;
+    _avatar_view.translatesAutoresizingMaskIntoConstraints = NO;
+
+    UILabel* eyebrow = [UILabel new];
+    eyebrow.text = NSLocalizedString(@"app.release.general.author_info.author", nil);
+    eyebrow.font = [UIFont app_fontForStyle:AppTextStyleCaption1 weight:UIFontWeightSemibold];
+    eyebrow.textColor = [AppColorProvider textTertiaryColor];
+
     _username_label = [UILabel new];
-    _username_label.textAlignment = NSTextAlignmentJustified;
-    _username_label.numberOfLines = 0;
-    
+    _username_label.textAlignment = NSTextAlignmentLeft;
+    _username_label.numberOfLines = 1;
+    _username_label.font = [UIFont app_fontForStyle:AppTextStyleSubheadline weight:UIFontWeightSemibold];
+    _username_label.textColor = [AppColorProvider textColor];
+
+    UIStackView* text_stack = [[UIStackView alloc] initWithArrangedSubviews:@[eyebrow, _username_label]];
+    text_stack.axis = UILayoutConstraintAxisVertical;
+    text_stack.spacing = 0;
+    text_stack.alignment = UIStackViewAlignmentLeading;
+    text_stack.translatesAutoresizingMaskIntoConstraints = NO;
+    text_stack.userInteractionEnabled = NO;
+
     [self addSubview:_avatar_button];
     [_avatar_button addSubview:_avatar_view];
-    [self addSubview:_username_label];
-    
-    _avatar_button.translatesAutoresizingMaskIntoConstraints = NO;
-    _avatar_view.translatesAutoresizingMaskIntoConstraints = NO;
-    _username_label.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:text_stack];
+
     [NSLayoutConstraint activateConstraints:@[
-        [_avatar_button.topAnchor constraintEqualToAnchor:self.layoutMarginsGuide.topAnchor],
-        [_avatar_button.leadingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.leadingAnchor],
-        [_avatar_button.heightAnchor constraintEqualToConstant:50],
-        [_avatar_button.widthAnchor constraintEqualToAnchor:_avatar_button.heightAnchor],
-        [_avatar_button.bottomAnchor constraintEqualToAnchor:self.layoutMarginsGuide.bottomAnchor],
-        
-        [_avatar_view.topAnchor constraintEqualToAnchor:_avatar_button.topAnchor],
-        [_avatar_view.leadingAnchor constraintEqualToAnchor:_avatar_button.leadingAnchor],
+        [_avatar_button.topAnchor      constraintEqualToAnchor:self.topAnchor],
+        [_avatar_button.leadingAnchor  constraintEqualToAnchor:self.leadingAnchor],
+        [_avatar_button.heightAnchor   constraintEqualToConstant:40],
+        [_avatar_button.widthAnchor    constraintEqualToAnchor:_avatar_button.heightAnchor],
+        [_avatar_button.bottomAnchor   constraintEqualToAnchor:self.bottomAnchor],
+
+        [_avatar_view.topAnchor      constraintEqualToAnchor:_avatar_button.topAnchor],
+        [_avatar_view.leadingAnchor  constraintEqualToAnchor:_avatar_button.leadingAnchor],
         [_avatar_view.trailingAnchor constraintEqualToAnchor:_avatar_button.trailingAnchor],
-        [_avatar_view.bottomAnchor constraintEqualToAnchor:_avatar_button.bottomAnchor],
-        
-        [_username_label.topAnchor constraintGreaterThanOrEqualToAnchor:self.layoutMarginsGuide.topAnchor],
-        [_username_label.leadingAnchor constraintEqualToAnchor:_avatar_button.trailingAnchor constant:8],
-        [_username_label.trailingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.trailingAnchor],
-        [_username_label.centerYAnchor constraintEqualToAnchor:self.layoutMarginsGuide.centerYAnchor],
-        [_username_label.bottomAnchor constraintLessThanOrEqualToAnchor:self.layoutMarginsGuide.bottomAnchor],
+        [_avatar_view.bottomAnchor   constraintEqualToAnchor:_avatar_button.bottomAnchor],
+
+        [text_stack.leadingAnchor  constraintEqualToAnchor:_avatar_button.trailingAnchor constant:AppSpacing12],
+        [text_stack.trailingAnchor constraintEqualToAnchor:self.trailingAnchor],
+        [text_stack.centerYAnchor  constraintEqualToAnchor:_avatar_button.centerYAnchor],
     ]];
+
+    _avatar_view.backgroundColor = [AppColorProvider posterPlaceholderColor];
 }
 
 -(void)setupLayout {
-    _avatar_view.backgroundColor = [AppColorProvider foregroundColor1];
-    _username_label.textColor = [AppColorProvider textColor];
+    // Colors are set inline; this method kept as a no-op so existing trait
+    // callers don't trip an unrecognized-selector.
 }
 
 -(void)refresh {
@@ -204,156 +224,212 @@
     return self;
 }
 
+// yukimo collection header — cover image (16:9) with bottom-up scrim + title
+// overlay, author row, action row (coral "Случайное" CTA + ghost bookmark /
+// comments), and a left-aligned description. ProfileListsView is rendered
+// below as a stats summary.
 -(void)setup {
-    _content_stack_view = [UIStackView new];
-    _content_stack_view.axis = UILayoutConstraintAxisVertical;
-    _content_stack_view.distribution = UIStackViewDistributionEqualSpacing;
-    _content_stack_view.alignment = UIStackViewAlignmentCenter;
-    _content_stack_view.spacing = 8;
-    
+    self.layoutMargins = UIEdgeInsetsZero;
+
+    // === Cover hero ===
+    UIView* hero_container = [UIView new];
+    hero_container.translatesAutoresizingMaskIntoConstraints = NO;
+    hero_container.clipsToBounds = YES;
+    hero_container.layer.cornerRadius = AppRadiusXLarge;
+    hero_container.layer.cornerCurve = kCACornerCurveContinuous;
+    hero_container.backgroundColor = [AppColorProvider posterPlaceholderColor];
+
     _image_view = [LoadableImageView new];
     _image_view.clipsToBounds = YES;
-    _image_view.layer.cornerRadius = 8;
     _image_view.contentMode = UIViewContentModeScaleAspectFill;
-    
+    _image_view.translatesAutoresizingMaskIntoConstraints = NO;
+
+    UIView* scrim = [UIView new];
+    scrim.translatesAutoresizingMaskIntoConstraints = NO;
+    scrim.userInteractionEnabled = NO;
+    CAGradientLayer* scrim_layer = [CAGradientLayer layer];
+    scrim_layer.colors = @[
+        (id)[UIColor colorWithWhite:0.0 alpha:0.0].CGColor,
+        (id)[UIColor colorWithWhite:0.0 alpha:0.65].CGColor,
+        (id)[UIColor colorWithWhite:0.0 alpha:0.90].CGColor,
+    ];
+    scrim_layer.locations = @[@0.0, @0.55, @1.0];
+    [scrim.layer addSublayer:scrim_layer];
+    // Tag so layoutSubviews can find it later.
+    scrim.tag = 9001;
+
     _title_label = [UILabel new];
-    _title_label.font = [UIFont systemFontOfSize:22];
-    _title_label.textAlignment = NSTextAlignmentJustified;
-    _title_label.numberOfLines = 0;
-    
-    _created_date_label = [UILabel new];
-    
-    _updated_date_label = [UILabel new];
-    
-    _actions_stack_view = [UIStackView new];
-    _actions_stack_view.axis = UILayoutConstraintAxisHorizontal;
-    _actions_stack_view.distribution = UIStackViewDistributionEqualSpacing;
-    _actions_stack_view.alignment = UIStackViewAlignmentCenter;
-    
-    _bookmark_button = [UIButton new];
-    [_bookmark_button addTarget:self action:@selector(onBookmarkButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    _bookmark_button.contentEdgeInsets = UIEdgeInsetsMake(0, 8, 0, 8);
-    _comments_button.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 3); 
-    _bookmark_button.layer.cornerRadius = 8;
-    
-    _comments_button = [UIButton new];
-    [_comments_button setImage:[UIImage systemImageNamed:@"message"] forState:UIControlStateNormal];
-    [_comments_button addTarget:self action:@selector(onCommentsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    _comments_button.contentEdgeInsets = UIEdgeInsetsMake(0, 8, 0, 8);
-    _comments_button.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 3);
-    _comments_button.layer.cornerRadius = 8;
-    
+    _title_label.font = [UIFont app_fontForStyle:AppTextStyleTitle2 weight:UIFontWeightBold];
+    _title_label.textAlignment = NSTextAlignmentLeft;
+    _title_label.numberOfLines = 3;
+    _title_label.textColor = UIColor.whiteColor;
+    _title_label.adjustsFontForContentSizeCategory = YES;
+    _title_label.translatesAutoresizingMaskIntoConstraints = NO;
+    _title_label.layer.shadowColor   = UIColor.blackColor.CGColor;
+    _title_label.layer.shadowOpacity = 0.6;
+    _title_label.layer.shadowRadius  = 6;
+    _title_label.layer.shadowOffset  = CGSizeMake(0, 1);
+
+    [hero_container addSubview:_image_view];
+    [hero_container addSubview:scrim];
+    [hero_container addSubview:_title_label];
+
+    // === Author row ===
     _author_view = [CollectionTableAuthorView new];
     _author_view.delegate = self;
-    
+    _author_view.translatesAutoresizingMaskIntoConstraints = NO;
+
+    // === Dates row (compact secondary text) ===
+    _created_date_label = [UILabel new];
+    _created_date_label.font = [UIFont app_fontForStyle:AppTextStyleFootnote];
+    _created_date_label.textColor = [AppColorProvider textTertiaryColor];
+    _created_date_label.numberOfLines = 1;
+
+    _updated_date_label = [UILabel new];
+    _updated_date_label.font = [UIFont app_fontForStyle:AppTextStyleFootnote];
+    _updated_date_label.textColor = [AppColorProvider textTertiaryColor];
+    _updated_date_label.numberOfLines = 1;
+
+    UIStackView* dates_stack = [[UIStackView alloc] initWithArrangedSubviews:@[_created_date_label, _updated_date_label]];
+    dates_stack.axis = UILayoutConstraintAxisVertical;
+    dates_stack.spacing = AppSpacing2;
+    dates_stack.alignment = UIStackViewAlignmentLeading;
+    dates_stack.translatesAutoresizingMaskIntoConstraints = NO;
+
+    // === Action row: coral CTA "Случайное" + glass bookmark + glass comments ===
+    _random_button = [UIButton buttonWithType:UIButtonTypeSystem];
+    [_random_button setTitle:NSLocalizedString(@"app.collection.random.title", nil) forState:UIControlStateNormal];
+    [_random_button setImage:[UIImage systemImageNamed:@"shuffle"] forState:UIControlStateNormal];
+    [_random_button setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
+    _random_button.tintColor = UIColor.whiteColor;
+    _random_button.titleLabel.font = [UIFont app_fontForStyle:AppTextStyleHeadline weight:UIFontWeightSemibold];
+    _random_button.backgroundColor = [AppColorProvider primaryColor];
+    _random_button.layer.cornerRadius = AppRadiusLarge;
+    _random_button.layer.cornerCurve = kCACornerCurveContinuous;
+    _random_button.contentEdgeInsets = UIEdgeInsetsMake(0, AppSpacing20, 0, AppSpacing20);
+    _random_button.titleEdgeInsets   = UIEdgeInsetsMake(0, AppSpacing8, 0, 0);
+    [_random_button addTarget:self action:@selector(onRandomButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+
+    _bookmark_button = [self makeSecondaryActionWithSymbol:@"bookmark"];
+    [_bookmark_button addTarget:self action:@selector(onBookmarkButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+
+    _comments_button = [self makeSecondaryActionWithSymbol:@"message"];
+    [_comments_button addTarget:self action:@selector(onCommentsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+
+    _actions_stack_view = [[UIStackView alloc] initWithArrangedSubviews:@[_random_button, _bookmark_button, _comments_button]];
+    _actions_stack_view.axis = UILayoutConstraintAxisHorizontal;
+    _actions_stack_view.spacing = AppSpacing12;
+    _actions_stack_view.alignment = UIStackViewAlignmentFill;
+    _actions_stack_view.translatesAutoresizingMaskIntoConstraints = NO;
+    [_random_button setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
+    [_bookmark_button setContentHuggingPriority:UILayoutPriorityDefaultHigh forAxis:UILayoutConstraintAxisHorizontal];
+    [_comments_button setContentHuggingPriority:UILayoutPriorityDefaultHigh forAxis:UILayoutConstraintAxisHorizontal];
+
+    // === Description ===
     _description_label = [ExpandableLabel new];
     _description_label.delegate = self;
-    
-    _lists_view = [ProfileListsView new];
-    
-    _lists_section_view = [[NamedSectionView alloc] initWithName:NSLocalizedString(@"app.collection.lists", "") view:_lists_view];
-    _lists_section_view.layoutMargins = UIEdgeInsetsMake(0, 0, 0, 0);
-    
-    _random_button = [UIButton new];
-    [_random_button setTitle:NSLocalizedString(@"app.collection.random.title", "") forState:UIControlStateNormal];
-    [_random_button setImage:[UIImage systemImageNamed:@"shuffle"] forState:UIControlStateNormal];
-    [_random_button addTarget:self action:@selector(onRandomButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    _random_button.layer.cornerRadius = 8;
-    
-    [self addSubview:_content_stack_view];
-    [_content_stack_view addArrangedSubview:_image_view];
-    [_content_stack_view addArrangedSubview:_title_label];
-    [_content_stack_view addArrangedSubview:_created_date_label];
-    [_content_stack_view addArrangedSubview:_updated_date_label];
-    [_content_stack_view addArrangedSubview:_actions_stack_view];
-    [_actions_stack_view addArrangedSubview:[UIView new]];
-    [_actions_stack_view addArrangedSubview:_bookmark_button];
-    [_actions_stack_view addArrangedSubview:[UIView new]];
-    [_actions_stack_view addArrangedSubview:_comments_button];
-    [_actions_stack_view addArrangedSubview:[UIView new]];
-    [_content_stack_view addArrangedSubview:_author_view];
-    [_content_stack_view addArrangedSubview:_description_label];
-    [_content_stack_view addArrangedSubview:_lists_section_view];
-    [_content_stack_view addArrangedSubview:_random_button];
-    
-    _content_stack_view.translatesAutoresizingMaskIntoConstraints = NO;
-    _image_view.translatesAutoresizingMaskIntoConstraints = NO;
-    _title_label.translatesAutoresizingMaskIntoConstraints = NO;
-    _created_date_label.translatesAutoresizingMaskIntoConstraints = NO;
-    _updated_date_label.translatesAutoresizingMaskIntoConstraints = NO;
-    _actions_stack_view.translatesAutoresizingMaskIntoConstraints = NO;
-    _bookmark_button.translatesAutoresizingMaskIntoConstraints = NO;
-    _comments_button.translatesAutoresizingMaskIntoConstraints = NO;
-    _author_view.translatesAutoresizingMaskIntoConstraints = NO;
     _description_label.translatesAutoresizingMaskIntoConstraints = NO;
+
+    // === Stats / lists ===
+    _lists_view = [ProfileListsView new];
+    _lists_section_view = [[NamedSectionView alloc] initWithName:NSLocalizedString(@"app.collection.lists", nil) view:_lists_view];
     _lists_section_view.translatesAutoresizingMaskIntoConstraints = NO;
-    _random_button.translatesAutoresizingMaskIntoConstraints = NO;
+
+    // === Main stack ===
+    _content_stack_view = [[UIStackView alloc] initWithArrangedSubviews:@[
+        hero_container, _author_view, dates_stack, _actions_stack_view,
+        _description_label, _lists_section_view,
+    ]];
+    _content_stack_view.axis = UILayoutConstraintAxisVertical;
+    _content_stack_view.alignment = UIStackViewAlignmentFill;
+    _content_stack_view.spacing = AppSpacing16;
+    [_content_stack_view setCustomSpacing:AppSpacing20 afterView:_actions_stack_view];
+    _content_stack_view.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:_content_stack_view];
+
     [NSLayoutConstraint activateConstraints:@[
-        [_content_stack_view.topAnchor constraintEqualToAnchor:self.layoutMarginsGuide.topAnchor],
-        [_content_stack_view.leadingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.leadingAnchor],
-        [_content_stack_view.trailingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.trailingAnchor],
-        [_content_stack_view.bottomAnchor constraintEqualToAnchor:self.layoutMarginsGuide.bottomAnchor],
-        
-        [_image_view.widthAnchor constraintEqualToAnchor:_content_stack_view.widthAnchor],
-        [_image_view.heightAnchor constraintEqualToAnchor:_content_stack_view.widthAnchor multiplier:(9. / 16)],
-        [_title_label.widthAnchor constraintEqualToAnchor:_content_stack_view.widthAnchor],
-        [_created_date_label.widthAnchor constraintEqualToAnchor:_content_stack_view.widthAnchor],
-        [_updated_date_label.widthAnchor constraintEqualToAnchor:_content_stack_view.widthAnchor],
-        [_actions_stack_view.widthAnchor constraintEqualToAnchor:_content_stack_view.widthAnchor],
-        [_actions_stack_view.heightAnchor constraintEqualToConstant:40],
-        [_bookmark_button.heightAnchor constraintEqualToAnchor:_actions_stack_view.heightAnchor],
-        [_bookmark_button.widthAnchor constraintGreaterThanOrEqualToConstant:60],
-        [_comments_button.heightAnchor constraintEqualToAnchor:_actions_stack_view.heightAnchor],
-        [_comments_button.widthAnchor constraintGreaterThanOrEqualToConstant:60],
-        [_author_view.widthAnchor constraintEqualToAnchor:_content_stack_view.widthAnchor],
-        [_description_label.widthAnchor constraintEqualToAnchor:_content_stack_view.widthAnchor],
-        [_lists_section_view.widthAnchor constraintEqualToAnchor:_content_stack_view.widthAnchor],
-        [_random_button.widthAnchor constraintEqualToAnchor:_content_stack_view.widthAnchor],
-        [_random_button.heightAnchor constraintEqualToConstant:50],
+        [_content_stack_view.topAnchor      constraintEqualToAnchor:self.topAnchor    constant:AppSpacing16],
+        [_content_stack_view.leadingAnchor  constraintEqualToAnchor:self.leadingAnchor],
+        [_content_stack_view.trailingAnchor constraintEqualToAnchor:self.trailingAnchor],
+        [_content_stack_view.bottomAnchor   constraintEqualToAnchor:self.bottomAnchor constant:-AppSpacing20],
+
+        // Cover hero
+        [hero_container.heightAnchor constraintEqualToAnchor:hero_container.widthAnchor multiplier:9.0/16.0],
+        [_image_view.topAnchor       constraintEqualToAnchor:hero_container.topAnchor],
+        [_image_view.leadingAnchor   constraintEqualToAnchor:hero_container.leadingAnchor],
+        [_image_view.trailingAnchor  constraintEqualToAnchor:hero_container.trailingAnchor],
+        [_image_view.bottomAnchor    constraintEqualToAnchor:hero_container.bottomAnchor],
+        [scrim.leadingAnchor         constraintEqualToAnchor:hero_container.leadingAnchor],
+        [scrim.trailingAnchor        constraintEqualToAnchor:hero_container.trailingAnchor],
+        [scrim.bottomAnchor          constraintEqualToAnchor:hero_container.bottomAnchor],
+        [scrim.heightAnchor          constraintEqualToAnchor:hero_container.heightAnchor multiplier:0.65],
+        [_title_label.leadingAnchor  constraintEqualToAnchor:hero_container.leadingAnchor  constant:AppSpacing16],
+        [_title_label.trailingAnchor constraintEqualToAnchor:hero_container.trailingAnchor constant:-AppSpacing16],
+        [_title_label.bottomAnchor   constraintEqualToAnchor:hero_container.bottomAnchor   constant:-AppSpacing16],
+
+        // Action row buttons height
+        [_random_button.heightAnchor   constraintEqualToConstant:52],
+        [_bookmark_button.widthAnchor  constraintEqualToConstant:52],
+        [_bookmark_button.heightAnchor constraintEqualToConstant:52],
+        [_comments_button.widthAnchor  constraintEqualToConstant:52],
+        [_comments_button.heightAnchor constraintEqualToConstant:52],
     ]];
 }
 
--(void)setupLayout {
-    _image_view.backgroundColor = [AppColorProvider foregroundColor1];
-    _title_label.textColor = [AppColorProvider textColor];
-    _created_date_label.textColor = [AppColorProvider textSecondaryColor];
-    _updated_date_label.textColor = [AppColorProvider textSecondaryColor];
-    _bookmark_button.backgroundColor = [AppColorProvider foregroundColor1];
-    [_bookmark_button setTitleColor:[AppColorProvider textColor] forState:UIControlStateNormal];
-    _comments_button.backgroundColor = [AppColorProvider foregroundColor1];
-    [_comments_button setTitleColor:[AppColorProvider textColor] forState:UIControlStateNormal];
-    _random_button.backgroundColor = [AppColorProvider foregroundColor1];
-    [_random_button setTitleColor:[AppColorProvider textColor] forState:UIControlStateNormal];
+-(UIButton*)makeSecondaryActionWithSymbol:(NSString*)symbol {
+    UIButton* b = [UIButton buttonWithType:UIButtonTypeSystem];
+    [b setImage:[UIImage systemImageNamed:symbol] forState:UIControlStateNormal];
+    b.tintColor = [AppColorProvider primaryColor];
+    b.backgroundColor = [AppColorProvider primarySoftColor];
+    b.layer.cornerRadius = AppRadiusLarge;
+    b.layer.cornerCurve = kCACornerCurveContinuous;
+    [b setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithPointSize:18 weight:UIImageSymbolWeightSemibold]
+                       forImageInState:UIControlStateNormal];
+    return b;
 }
+
+// Re-position the scrim's CAGradientLayer when the hero resizes.
+-(void)layoutSubviews {
+    [super layoutSubviews];
+    UIView* hero = nil;
+    for (UIView* v in _content_stack_view.arrangedSubviews) {
+        if ([v viewWithTag:9001]) { hero = v; break; }
+    }
+    UIView* scrim = [hero viewWithTag:9001];
+    if (scrim.layer.sublayers.firstObject) {
+        scrim.layer.sublayers.firstObject.frame = scrim.bounds;
+    }
+}
+
+-(void)setupLayout { /* All colors set inline above. */ }
 
 -(void)refresh {
     _title_label.text = TO_NSSTRING(_collection->title);
-    
-    _created_date_label.text = [NSString stringWithFormat:@"%@: %@", NSLocalizedString(@"app.collection.created.start", ""), [NSDateFormatter localizedStringFromDate:anix_time_point_to_nsdate(_collection->creation_date) dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterShortStyle]];
-    
-    _updated_date_label.text = [NSString stringWithFormat:@"%@: %@", NSLocalizedString(@"app.collection.updated.start", ""), [NSDateFormatter localizedStringFromDate:anix_time_point_to_nsdate(_collection->last_update_date) dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterShortStyle]];
-    
-    [_bookmark_button setTitle:[@(_collection->favorite_count) stringValue] forState:UIControlStateNormal];
+
+    _created_date_label.text = [NSString stringWithFormat:@"%@: %@",
+        NSLocalizedString(@"app.collection.created.start", nil),
+        [NSDateFormatter localizedStringFromDate:anix_time_point_to_nsdate(_collection->creation_date)
+                                       dateStyle:NSDateFormatterMediumStyle
+                                       timeStyle:NSDateFormatterNoStyle]];
+
+    _updated_date_label.text = [NSString stringWithFormat:@"%@: %@",
+        NSLocalizedString(@"app.collection.updated.start", nil),
+        [NSDateFormatter localizedStringFromDate:anix_time_point_to_nsdate(_collection->last_update_date)
+                                       dateStyle:NSDateFormatterMediumStyle
+                                       timeStyle:NSDateFormatterNoStyle]];
+
     [self updateBookmarkButton];
-    
-    [_comments_button setTitle:[@(_collection->comment_count) stringValue] forState:UIControlStateNormal];
-    
     [_author_view setCollection:_collection];
-    
     [_description_label setText:TO_NSSTRING(_collection->description)];
-    
     [_lists_view setFromCollectionGetInfo:_collection_get_info];
-    
+
     NSURL* image_url = [NSURL URLWithString:TO_NSSTRING(_collection->image_url)];
     [_image_view tryLoadImageWithURL:image_url];
 }
 
 -(void)updateBookmarkButton {
-    if (_collection->is_favorite) {
-        [_bookmark_button setImage:[UIImage systemImageNamed:@"bookmark.fill"] forState:UIControlStateNormal];
-    } else {
-        [_bookmark_button setImage:[UIImage systemImageNamed:@"bookmark"] forState:UIControlStateNormal];
-    }
+    NSString* sym = _collection->is_favorite ? @"bookmark.fill" : @"bookmark";
+    [_bookmark_button setImage:[UIImage systemImageNamed:sym] forState:UIControlStateNormal];
 }
 
 -(void)setCollectionGetInfo:(anixart::CollectionGetInfo::Ptr)collection_get_info {
@@ -454,6 +530,7 @@
 
 -(void)preSetupLayout {
     self.view.backgroundColor = [AppColorProvider backgroundColor];
+    [AppBackdrop installIn:self.view];
 }
 
 -(void)setupLayout {

@@ -10,6 +10,10 @@
 #import "AppDataController.h"
 #import "AuthViewController.h"
 #import "MainTabBarController.h"
+// Yukimo SwiftUI redesign — exposes +[YukimoHostFactory makeRootViewController].
+// The generated Swift interface header lives next to derived sources and is on
+// the header search path automatically when SWIFT_INSTALL_OBJC_HEADER=YES.
+#import "AniAnglia-Swift.h"
 
 @interface MainWindow ()
 @end
@@ -28,11 +32,12 @@
     return self;
 }
 -(UIViewController*)getFirstRootViewController {
-    NSString* token = [[AppDataController sharedInstance] getToken];
-    if ([token length] == 0) {
-        return [[UINavigationController alloc] initWithRootViewController:[AuthViewController new]];
-    }
-    return [MainTabBarController new];
+    // Yukimo redesign: a SwiftUI root that internally decides between
+    // splash → onboarding/auth → main shell based on session state.
+    // Legacy AuthViewController / MainTabBarController are no longer
+    // entry points; they remain on disk to keep the build green during
+    // the staged migration.
+    return [YukimoHostFactory makeRootViewController];
 }
 
 -(void)setRootViewController:(UIViewController*)root_view_controller {

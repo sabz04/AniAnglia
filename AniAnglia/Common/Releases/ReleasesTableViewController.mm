@@ -113,15 +113,18 @@
     
     [self.view addSubview:_loadable_view];
     [self.view addSubview:_empty_label];
-    
+
     _loadable_view.translatesAutoresizingMaskIntoConstraints = NO;
     _empty_label.translatesAutoresizingMaskIntoConstraints = NO;
+    // Pin to the table's *frameLayoutGuide* (visible rect) rather than the
+    // scrollable layoutMarginsGuide — otherwise the empty state can land
+    // off-screen when the table has no content, looking like nothing rendered.
     [NSLayoutConstraint activateConstraints:@[
-        [_loadable_view.centerXAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.centerXAnchor],
-        [_loadable_view.centerYAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.centerYAnchor],
-        
-        [_empty_label.centerXAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.centerXAnchor],
-        [_empty_label.centerYAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.centerYAnchor],
+        [_loadable_view.centerXAnchor constraintEqualToAnchor:_table_view.frameLayoutGuide.centerXAnchor],
+        [_loadable_view.centerYAnchor constraintEqualToAnchor:_table_view.frameLayoutGuide.centerYAnchor],
+
+        [_empty_label.centerXAnchor constraintEqualToAnchor:_table_view.frameLayoutGuide.centerXAnchor],
+        [_empty_label.centerYAnchor constraintEqualToAnchor:_table_view.frameLayoutGuide.centerYAnchor],
     ]];
 }
 
@@ -174,7 +177,7 @@
     return [_data_provider getItemsCount];
 }
 -(CGFloat)tableView:(UITableView*)table_view heightForRowAtIndexPath:(NSIndexPath*)index_path {
-    return 175;
+    return 184;  // accommodates 132pt poster + margins + breathing room
 }
 -(UITableViewCell*)tableView:(UITableView*)table_view cellForRowAtIndexPath:(NSIndexPath*)index_path {
     NSInteger index = [index_path item];

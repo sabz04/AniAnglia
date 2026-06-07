@@ -6,8 +6,10 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <objc/runtime.h>
 #import "ProfileViewController.h"
 #import "AppColor.h"
+#import "AppBackdrop.h"
 #import "LoadableView.h"
 #import "LibanixartApi.h"
 #import "AppDataController.h"
@@ -198,37 +200,46 @@
 }
 
 -(void)setup {
+    self.layer.cornerRadius = AppRadiusLarge;
+    self.layer.cornerCurve  = kCACornerCurveContinuous;
+    self.clipsToBounds = YES;
+
     _count_label = [UILabel new];
     _count_label.text = [@(_count) stringValue];
     _count_label.textAlignment = NSTextAlignmentCenter;
     _count_label.userInteractionEnabled = NO;
+    _count_label.font = [UIFont app_monospacedDigitFontForStyle:AppTextStyleTitle3 weight:UIFontWeightBold];
+    _count_label.adjustsFontForContentSizeCategory = YES;
+
     _name_label = [UILabel new];
     _name_label.text = _name;
     _name_label.textAlignment = NSTextAlignmentCenter;
     _name_label.userInteractionEnabled = NO;
-    _name_label.font = [UIFont systemFontOfSize:14];
-    
+    _name_label.font = [UIFont app_fontForStyle:AppTextStyleCaption1 weight:UIFontWeightMedium];
+    _name_label.adjustsFontForContentSizeCategory = YES;
+    _name_label.numberOfLines = 1;
+
     [self addSubview:_count_label];
     [self addSubview:_name_label];
-    
+
     _count_label.translatesAutoresizingMaskIntoConstraints = NO;
     _name_label.translatesAutoresizingMaskIntoConstraints = NO;
     [NSLayoutConstraint activateConstraints:@[
-        [_count_label.topAnchor constraintEqualToAnchor:self.layoutMarginsGuide.topAnchor],
-        [_count_label.leadingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.leadingAnchor],
-        [_count_label.trailingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.trailingAnchor],
-        
-        [_name_label.topAnchor constraintEqualToAnchor:_count_label.bottomAnchor constant:5],
-        [_name_label.leadingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.leadingAnchor],
-        [_name_label.trailingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.trailingAnchor],
-        [_name_label.bottomAnchor constraintEqualToAnchor:self.layoutMarginsGuide.bottomAnchor]
+        [_count_label.topAnchor      constraintEqualToAnchor:self.topAnchor      constant:AppSpacing12],
+        [_count_label.leadingAnchor  constraintEqualToAnchor:self.leadingAnchor  constant:AppSpacing4],
+        [_count_label.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-AppSpacing4],
+
+        [_name_label.topAnchor      constraintEqualToAnchor:_count_label.bottomAnchor constant:AppSpacing2],
+        [_name_label.leadingAnchor  constraintEqualToAnchor:self.leadingAnchor  constant:AppSpacing4],
+        [_name_label.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-AppSpacing4],
+        [_name_label.bottomAnchor   constraintEqualToAnchor:self.bottomAnchor   constant:-AppSpacing12],
     ]];
 }
 
 -(void)setupLayout {
-    self.backgroundColor = [AppColorProvider foregroundColor1];
+    self.backgroundColor = [AppColorProvider surfaceElevatedColor];
     _count_label.textColor = [AppColorProvider textColor];
-    _name_label.textColor = [AppColorProvider textSecondaryColor];
+    _name_label.textColor  = [AppColorProvider textSecondaryColor];
 }
 
 -(void)setCount:(NSInteger)count {
@@ -611,51 +622,61 @@ static const NSInteger PROFILE_WATCH_DYNAMICS_CELL_COUNT_LABEL_HEIGHT = 30;
     
     return self;
 }
+// Clean redesign: vertical bar with coral gradient + monospaced count above +
+// horizontal day label below. No rotation — readability over cleverness.
 -(void)setup {
     _count_label = [UILabel new];
     _count_label.textAlignment = NSTextAlignmentCenter;
-    
+    _count_label.font = [UIFont app_monospacedDigitFontForStyle:AppTextStyleFootnote weight:UIFontWeightSemibold];
+    _count_label.adjustsFontForContentSizeCategory = YES;
+
     _indicator_container_view = [UIView new];
-    _indicator_container_view.clipsToBounds = YES;
+    _indicator_container_view.clipsToBounds = NO;
+    _indicator_container_view.translatesAutoresizingMaskIntoConstraints = NO;
 
     _indicator_view = [UIView new];
-    _indicator_view.layer.cornerRadius = 8;
+    _indicator_view.layer.cornerRadius = 6;
+    _indicator_view.layer.cornerCurve = kCACornerCurveContinuous;
     _indicator_view.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
-    
+    _indicator_view.translatesAutoresizingMaskIntoConstraints = NO;
+
     _time_label = [UILabel new];
-    _time_label.font = [UIFont systemFontOfSize:12];
-    _time_label.transform = CGAffineTransformMakeRotation(-70 * (M_PI / 180));
-    
+    _time_label.font = [UIFont app_fontForStyle:AppTextStyleCaption2 weight:UIFontWeightMedium];
+    _time_label.textAlignment = NSTextAlignmentCenter;
+    _time_label.adjustsFontForContentSizeCategory = YES;
+    _time_label.translatesAutoresizingMaskIntoConstraints = NO;
+    // No more rotated text — keep it horizontal for legibility.
+
+    [self addSubview:_count_label];
     [self addSubview:_indicator_container_view];
     [self addSubview:_time_label];
-    [self addSubview:_count_label];
     [_indicator_container_view addSubview:_indicator_view];
-    
+
     _count_label.translatesAutoresizingMaskIntoConstraints = NO;
-    _indicator_container_view.translatesAutoresizingMaskIntoConstraints = NO;
-    _indicator_wrapper_view.translatesAutoresizingMaskIntoConstraints = NO;
-    _indicator_view.translatesAutoresizingMaskIntoConstraints = NO;
-    _time_label.translatesAutoresizingMaskIntoConstraints = NO;
     _indicator_height_constraint = nil;
     [NSLayoutConstraint activateConstraints:@[
-        [_indicator_container_view.topAnchor constraintEqualToAnchor:self.layoutMarginsGuide.topAnchor constant:(PROFILE_WATCH_DYNAMICS_CELL_COUNT_LABEL_HEIGHT + 5)], // + offset
-        [_indicator_container_view.leadingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.leadingAnchor],
-        [_indicator_container_view.trailingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.trailingAnchor],
-        [_indicator_container_view.bottomAnchor constraintEqualToAnchor:self.layoutMarginsGuide.bottomAnchor constant:-(PROFILE_WATCH_DYNAMICS_CELL_COUNT_LABEL_HEIGHT + 10)], // + top and bottom offset
-        
-        [_count_label.topAnchor constraintGreaterThanOrEqualToAnchor:self.layoutMarginsGuide.topAnchor],
-        [_count_label.leadingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.leadingAnchor],
-        [_count_label.trailingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.trailingAnchor],
-        [_count_label.bottomAnchor constraintEqualToAnchor:_indicator_view.topAnchor constant:-5],
-        
-        [_indicator_view.topAnchor constraintGreaterThanOrEqualToAnchor:_indicator_container_view.topAnchor],
-        [_indicator_view.leadingAnchor constraintEqualToAnchor:_indicator_container_view.leadingAnchor],
+        // Count label at the top, centered.
+        [_count_label.topAnchor      constraintEqualToAnchor:self.topAnchor],
+        [_count_label.leadingAnchor  constraintEqualToAnchor:self.leadingAnchor],
+        [_count_label.trailingAnchor constraintEqualToAnchor:self.trailingAnchor],
+        [_count_label.heightAnchor   constraintEqualToConstant:18],
+
+        // Bar container — between count and day label.
+        [_indicator_container_view.topAnchor      constraintEqualToAnchor:_count_label.bottomAnchor    constant:AppSpacing4],
+        [_indicator_container_view.leadingAnchor  constraintEqualToAnchor:self.leadingAnchor           constant:AppSpacing4],
+        [_indicator_container_view.trailingAnchor constraintEqualToAnchor:self.trailingAnchor          constant:-AppSpacing4],
+        [_indicator_container_view.bottomAnchor   constraintEqualToAnchor:_time_label.topAnchor        constant:-AppSpacing4],
+
+        // Indicator bar grows from the bottom up (height set in setCount:).
+        [_indicator_view.leadingAnchor  constraintEqualToAnchor:_indicator_container_view.leadingAnchor],
         [_indicator_view.trailingAnchor constraintEqualToAnchor:_indicator_container_view.trailingAnchor],
-        [_indicator_view.bottomAnchor constraintEqualToAnchor:_indicator_container_view.bottomAnchor],
-        
-        [_time_label.topAnchor constraintEqualToAnchor:_indicator_container_view.bottomAnchor constant:5],
-        [_time_label.heightAnchor constraintEqualToConstant:PROFILE_WATCH_DYNAMICS_CELL_TIME_LABEL_HEIGHT],
-        [_time_label.bottomAnchor constraintEqualToAnchor:self.layoutMarginsGuide.bottomAnchor constant:-5]
+        [_indicator_view.bottomAnchor   constraintEqualToAnchor:_indicator_container_view.bottomAnchor],
+
+        // Day label at the bottom — horizontal, small, secondary.
+        [_time_label.leadingAnchor  constraintEqualToAnchor:self.leadingAnchor],
+        [_time_label.trailingAnchor constraintEqualToAnchor:self.trailingAnchor],
+        [_time_label.bottomAnchor   constraintEqualToAnchor:self.bottomAnchor],
+        [_time_label.heightAnchor   constraintEqualToConstant:14],
     ]];
 }
 -(void)setupLayout {
@@ -764,7 +785,15 @@ static size_t PROFILE_WATCH_DYNAMICS_COLLECTION_VIEW_HEIGHT = 200;
 }
 
 -(CGSize)collectionView:(UICollectionView *)collection_view layout:(UICollectionViewLayout *)collection_view_layout sizeForItemAtIndexPath:(NSIndexPath *)index_path {
-    return CGSizeMake(40, PROFILE_WATCH_DYNAMICS_COLLECTION_VIEW_HEIGHT);
+    return CGSizeMake(36, PROFILE_WATCH_DYNAMICS_COLLECTION_VIEW_HEIGHT);
+}
+
+-(CGFloat)collectionView:(UICollectionView *)collection_view layout:(UICollectionViewLayout *)collection_view_layout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section {
+    return 4;
+}
+
+-(CGFloat)collectionView:(UICollectionView *)collection_view layout:(UICollectionViewLayout *)collection_view_layout minimumLineSpacingForSectionAtIndex:(NSInteger)section {
+    return 4;
 }
 @end
 
@@ -841,121 +870,194 @@ static size_t PROFILE_WATCH_DYNAMICS_COLLECTION_VIEW_HEIGHT = 200;
         [_loading_view.centerYAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.centerYAnchor],
     ]];
 }
+// yukimo profile layout — Crunchyroll-style hero with overlapping avatar:
+//
+//   ┌─ coral→purple gradient cover banner (140pt) ─┐
+//   │                                                │
+//   │                   ╭─────╮                      │  <- avatar 96pt overlaps -48
+//   │                   │  A  │                      │
+//   └───────────────────┼─────┼──────────────────────┘
+//                       ╰─────╯
+//                       Username
+//                       online · status text
+//                  [Edit / Add Friend / ...]
+//
+//   ┌───┬───┬───┬───┐  <- 4 stat glass cards
+//   │ N │ N │ N │ N │
+//   └───┴───┴───┴───┘
+//
+//   Sections (Lists / Dynamics / Votes / History) in margined cards
 -(void)setup {
     __weak auto weak_self = self;
-    
-    _content_stack_view = [UIStackView new];
-    _content_stack_view.axis = UILayoutConstraintAxisVertical;
-    _content_stack_view.distribution = UIStackViewDistributionEqualSpacing;
-    _content_stack_view.alignment = UIStackViewAlignmentCenter;
-    _content_stack_view.spacing = 5;
-    _content_stack_view.directionalLayoutMargins = NSDirectionalEdgeInsetsMake(0, 8, 0, 8);
-    
+
+    // === Cover banner ===
+    UIView* cover = [UIView new];
+    cover.translatesAutoresizingMaskIntoConstraints = NO;
+    cover.clipsToBounds = YES;
+    cover.layer.cornerRadius = AppRadiusXLarge;
+    cover.layer.cornerCurve = kCACornerCurveContinuous;
+    cover.backgroundColor = [AppColorProvider primarySoftColor];
+    CAGradientLayer* coverGradient = [CAGradientLayer layer];
+    coverGradient.colors = @[
+        (id)[[AppColorProvider primaryColor]   colorWithAlphaComponent:0.55].CGColor,
+        (id)[[AppColorProvider secondaryColor] colorWithAlphaComponent:0.45].CGColor,
+    ];
+    coverGradient.startPoint = CGPointMake(0, 0);
+    coverGradient.endPoint   = CGPointMake(1, 1);
+    [cover.layer addSublayer:coverGradient];
+    cover.tag = 8001; // re-layout gradient in viewDidLayoutSubviews
+
+    // === Avatar (overlapping the cover) ===
     _avatar_image_view = [LoadableImageView new];
     _avatar_image_view.clipsToBounds = YES;
-    _avatar_image_view.layer.cornerRadius = 40;
-    
+    _avatar_image_view.layer.cornerRadius = 48; // 96pt diameter
+    _avatar_image_view.contentMode = UIViewContentModeScaleAspectFill;
+    _avatar_image_view.translatesAutoresizingMaskIntoConstraints = NO;
+
+    // === Username / status / custom-status ===
     _username_label = [UILabel new];
-    
+    _username_label.textAlignment = NSTextAlignmentCenter;
+    _username_label.numberOfLines = 1;
+
+    _status_label = [UILabel new];
+    _status_label.textAlignment = NSTextAlignmentCenter;
+    _status_label.numberOfLines = 1;
+
     _custom_status_label = [UILabel new];
     _custom_status_label.numberOfLines = 0;
     _custom_status_label.textAlignment = NSTextAlignmentCenter;
-    
-    NSMutableArray<NSLayoutConstraint*>* optional_constraints = [NSMutableArray arrayWithCapacity:3];
-    
-    _status_label = [UILabel new];
-    
-    _stats_view = [ProfileStatsBlockView new];
-    _stats_view.delegate = self;
-    
+
+    UIStackView* identity_stack = [[UIStackView alloc] initWithArrangedSubviews:@[_username_label, _status_label, _custom_status_label]];
+    identity_stack.axis = UILayoutConstraintAxisVertical;
+    identity_stack.alignment = UIStackViewAlignmentCenter;
+    identity_stack.spacing = AppSpacing4;
+    identity_stack.translatesAutoresizingMaskIntoConstraints = NO;
+
+    // === Roles strip ===
     _roles_view = [ProfileRolesView new];
-    
+    _roles_view.translatesAutoresizingMaskIntoConstraints = NO;
+
+    // === Actions (only foreign profiles get the row) ===
     if (!_is_my_profile) {
         _actions_view = [ProfileActionsView new];
         _actions_view.delegate = self;
-        [optional_constraints addObject:[_actions_view.widthAnchor constraintEqualToAnchor:_content_stack_view.layoutMarginsGuide.widthAnchor]];
     }
-    
+
+    // === Stats block (4 glass cards) ===
+    _stats_view = [ProfileStatsBlockView new];
+    _stats_view.delegate = self;
+    _stats_view.translatesAutoresizingMaskIntoConstraints = NO;
+
+    // === Sectioned content ===
     _lists_view = [ProfileListsView new];
-    
     _lists_section_view = [[RelativeNamedSectionView alloc] initWithName:NSLocalizedString(@"app.profile.lists", "") view:_lists_view];
     [_lists_section_view setShowAllButtonEnabled:!_is_my_profile];
-    [_lists_section_view setShowAllHandler:^{
-        [weak_self onListsShowAllPressed];
-    }];
+    [_lists_section_view setShowAllHandler:^{ [weak_self onListsShowAllPressed]; }];
     _lists_section_view.relative_index = 1;
-    _lists_section_view.layoutMargins = UIEdgeInsetsMake(0, 0, 0, 0);
-    
+    _lists_section_view.layoutMargins = UIEdgeInsetsZero;
+
     _watch_dynamics_view = [ProfileWatchDynamicsView new];
     _watch_dynamics_view.layoutMargins = UIEdgeInsetsZero;
-    
     _watch_dynamics_section_view = [[RelativeNamedSectionView alloc] initWithName:NSLocalizedString(@"app.profile.watch_dynamics", "") view:_watch_dynamics_view];
     _watch_dynamics_section_view.relative_index = 3;
-    _watch_dynamics_section_view.layoutMargins = UIEdgeInsetsMake(0, 0, 0, 0);
-    
+    _watch_dynamics_section_view.layoutMargins = UIEdgeInsetsZero;
+
     _named_sections_view = [NamedSectionsStackView new];
     _named_sections_view.axis = UILayoutConstraintAxisVertical;
-    _named_sections_view.distribution = UIStackViewDistributionEqualSpacing;
     _named_sections_view.alignment = UIStackViewAlignmentFill;
-    _named_sections_view.spacing = 10;
-    _named_sections_view.layoutMargins = UIEdgeInsetsMake(0, 0, 0, 0);
-    
-    [_scroll_view addSubview:_content_stack_view];
-    [_content_stack_view addArrangedSubview:_avatar_image_view];
-    [_content_stack_view addArrangedSubview:_username_label];
-    [_content_stack_view addArrangedSubview:_custom_status_label];
-    [_content_stack_view addArrangedSubview:_roles_view];
-    [_content_stack_view addArrangedSubview:_status_label];
-    [_content_stack_view addArrangedSubview:_stats_view];
-    [_content_stack_view addArrangedSubview:_actions_view];
-    [_content_stack_view addArrangedSubview:_named_sections_view];
+    _named_sections_view.spacing = AppSpacing20;
+    _named_sections_view.layoutMargins = UIEdgeInsetsZero;
     [_named_sections_view addRelativeNamedSection:_lists_section_view];
     [_named_sections_view addRelativeNamedSection:_watch_dynamics_section_view];
-    
+
+    // === Main vertical content stack ===
+    NSMutableArray<UIView*>* main_subviews = [NSMutableArray new];
+    [main_subviews addObject:cover];
+    [main_subviews addObject:identity_stack];
+    [main_subviews addObject:_roles_view];
+    if (_actions_view) [main_subviews addObject:_actions_view];
+    [main_subviews addObject:_stats_view];
+    [main_subviews addObject:_named_sections_view];
+
+    _content_stack_view = [[UIStackView alloc] initWithArrangedSubviews:main_subviews];
+    _content_stack_view.axis = UILayoutConstraintAxisVertical;
+    _content_stack_view.alignment = UIStackViewAlignmentFill;
+    _content_stack_view.spacing = AppSpacing20;
     _content_stack_view.translatesAutoresizingMaskIntoConstraints = NO;
-    _avatar_image_view.translatesAutoresizingMaskIntoConstraints = NO;
-    _username_label.translatesAutoresizingMaskIntoConstraints = NO;
-    _custom_status_label.translatesAutoresizingMaskIntoConstraints = NO;
-    _status_label.translatesAutoresizingMaskIntoConstraints = NO;
-    _stats_view.translatesAutoresizingMaskIntoConstraints = NO;
-    _actions_view.translatesAutoresizingMaskIntoConstraints = NO;
-    _named_sections_view.translatesAutoresizingMaskIntoConstraints = NO;
-    _roles_view.translatesAutoresizingMaskIntoConstraints = NO;
+    _content_stack_view.directionalLayoutMargins = NSDirectionalEdgeInsetsMake(0, AppSpacing16, AppSpacing24, AppSpacing16);
+    _content_stack_view.layoutMarginsRelativeArrangement = YES;
+    // Avatar overlaps cover: less space between cover and identity stack.
+    [_content_stack_view setCustomSpacing:AppSpacing16 afterView:cover];
+
+    [_scroll_view addSubview:_content_stack_view];
+    // Avatar must live outside the stack to overlap the cover edge — add as a
+    // sibling of the stack, in front of it, anchored to the cover's centerX
+    // and bottom.
+    [_scroll_view addSubview:_avatar_image_view];
+
     [NSLayoutConstraint activateConstraints:@[
-        [_content_stack_view.topAnchor constraintEqualToAnchor:_scroll_view.topAnchor],
-        [_content_stack_view.leadingAnchor constraintEqualToAnchor:_scroll_view.leadingAnchor],
-        [_content_stack_view.trailingAnchor constraintEqualToAnchor:_scroll_view.trailingAnchor],
-        [_content_stack_view.widthAnchor constraintEqualToAnchor:_scroll_view.widthAnchor],
-        [_content_stack_view.bottomAnchor constraintEqualToAnchor:_scroll_view.bottomAnchor],
-        
-        [_avatar_image_view.heightAnchor constraintEqualToConstant:80],
-        [_avatar_image_view.widthAnchor constraintEqualToConstant:80],
-        
-        [_roles_view.heightAnchor constraintEqualToConstant:60],
-        [_roles_view.widthAnchor constraintEqualToAnchor:_content_stack_view.layoutMarginsGuide.widthAnchor],
-        [_username_label.widthAnchor constraintLessThanOrEqualToAnchor:_content_stack_view.layoutMarginsGuide.widthAnchor],
-        [_custom_status_label.widthAnchor constraintLessThanOrEqualToAnchor:_content_stack_view.layoutMarginsGuide.widthAnchor],
-        [_status_label.widthAnchor constraintLessThanOrEqualToAnchor:_content_stack_view.layoutMarginsGuide.widthAnchor],
-        [_stats_view.widthAnchor constraintEqualToAnchor:_content_stack_view.layoutMarginsGuide.widthAnchor],
-        [_named_sections_view.widthAnchor constraintEqualToAnchor:_content_stack_view.widthAnchor],
+        // Stack pins to scroll content.
+        [_content_stack_view.topAnchor      constraintEqualToAnchor:_scroll_view.contentLayoutGuide.topAnchor],
+        [_content_stack_view.leadingAnchor  constraintEqualToAnchor:_scroll_view.contentLayoutGuide.leadingAnchor],
+        [_content_stack_view.trailingAnchor constraintEqualToAnchor:_scroll_view.contentLayoutGuide.trailingAnchor],
+        [_content_stack_view.bottomAnchor   constraintEqualToAnchor:_scroll_view.contentLayoutGuide.bottomAnchor],
+        [_content_stack_view.widthAnchor    constraintEqualToAnchor:_scroll_view.frameLayoutGuide.widthAnchor],
+
+        // Cover banner — full-bleed inside the stack's margins, 140pt tall.
+        [cover.heightAnchor constraintEqualToConstant:140],
+
+        // Avatar — 96pt, centered horizontally, overlaps the cover by 48pt
+        // (its bottom = cover.bottom + 48 → halfway over the cover edge).
+        [_avatar_image_view.centerXAnchor constraintEqualToAnchor:cover.centerXAnchor],
+        [_avatar_image_view.centerYAnchor constraintEqualToAnchor:cover.bottomAnchor],
+        [_avatar_image_view.widthAnchor   constraintEqualToConstant:96],
+        [_avatar_image_view.heightAnchor  constraintEqualToConstant:96],
+
+        // Roles row — fixed height.
+        [_roles_view.heightAnchor constraintEqualToConstant:44],
     ]];
-    [NSLayoutConstraint activateConstraints:optional_constraints];
-    
+
+    // First identity row needs extra top spacing to clear the overlapping
+    // avatar (48pt of overlap).
+    [_content_stack_view setCustomSpacing:48 + AppSpacing12 afterView:cover];
+
     NSURL* avatar_url = [NSURL URLWithString:TO_NSSTRING(_profile->avatar_url)];
     [_avatar_image_view tryLoadImageWithURL:avatar_url];
-    
+
+    // Re-layout the cover gradient frame on each pass.
+    objc_setAssociatedObject(self, "yk_cover_gradient", coverGradient, OBJC_ASSOCIATION_ASSIGN);
+    objc_setAssociatedObject(self, "yk_cover_view", cover, OBJC_ASSOCIATION_ASSIGN);
+
     _is_ui_inited = YES;
 }
 
 -(void)preSetupLayout {
+    // Clean neutral background — no decorative backdrop here; the cover
+    // banner already provides brand colour at the top.
     self.view.backgroundColor = [AppColorProvider backgroundColor];
 }
 
 -(void)setupLayout {
-    _avatar_image_view.backgroundColor = [AppColorProvider foregroundColor1];
+    _avatar_image_view.backgroundColor = [AppColorProvider posterPlaceholderColor];
+    // 4pt background-color "punched-out" ring — Apple Music profile convention.
+    // Reads cleanly at the avatar/cover boundary on both light & dark mode.
+    _avatar_image_view.layer.borderWidth = 4;
+    _avatar_image_view.layer.borderColor = [AppColorProvider backgroundColor].CGColor;
+    _avatar_image_view.clipsToBounds = YES;
+
+    _username_label.font = [UIFont app_fontForStyle:AppTextStyleTitle2 weight:UIFontWeightBold];
     _username_label.textColor = [AppColorProvider textColor];
-    _custom_status_label.textColor = [AppColorProvider textColor];
-    _status_label.textColor = [AppColorProvider textSecondaryColor];
+    _custom_status_label.font = [UIFont app_fontForStyle:AppTextStyleSubheadline];
+    _custom_status_label.textColor = [AppColorProvider textSecondaryColor];
+    _status_label.font = [UIFont app_fontForStyle:AppTextStyleFootnote weight:UIFontWeightMedium];
+    _status_label.textColor = [AppColorProvider textTertiaryColor];
+}
+
+-(void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    CAGradientLayer* g = objc_getAssociatedObject(self, "yk_cover_gradient");
+    UIView* cover = objc_getAssociatedObject(self, "yk_cover_view");
+    if (g && cover) g.frame = cover.bounds;
 }
 
 -(void)refresh {

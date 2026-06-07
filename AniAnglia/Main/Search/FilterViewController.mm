@@ -1,982 +1,721 @@
 //
-//  FilterViewController.m
-//  AniAnglia
+//  FilterViewController.mm
 //
-//  Created by Toilettrauma on 13.12.2024.
+//  Release-search filter screen.
+//
+//  Apple Settings-style grouped table. Each row shows the filter name and
+//  its current value; tapping pushes a checkmark picker (single- or multi-
+//  select) that writes back into `_filter_request`. A "Сбросить" button in
+//  the nav bar wipes the request; "Применить" at the bottom kicks off the
+//  search and pushes a `ReleasesViewController` with the results.
 //
 
-#import <Foundation/Foundation.h>
 #import "FilterViewController.h"
 #import "AppColor.h"
 #import "LibanixartApi.h"
 #import "StringCvt.h"
-#import "SearchViewController.h"
-#import "ReleasesHistoryTableViewController.h"
 #import "ReleasesViewController.h"
+#import "ReleasesPageableDataProvider.h"
 #import "ProfileListsView.h"
 
-@class MultiSelectMenuModalViewController;
+#import <vector>
+#import <optional>
+#import <chrono>
 
-@protocol MultiSelectMenuButtonPresenter <NSObject>
--(void)presentMultiSelectViewController:(UIViewController*)view_controller;
+
+#pragma mark - FilterPickerViewController
+
+/// Generic checkmark picker — used for every filter row. Selecting an item
+/// invokes the on-pick block; `multi` controls whether multiple items can be
+/// selected at once.
+@interface FilterPickerViewController : UITableViewController
+@property(nonatomic, copy) NSArray<NSString*>* items;
+@property(nonatomic) BOOL multi;
+@property(nonatomic, copy) NSMutableIndexSet* selected_indices;
+@property(nonatomic, copy) void(^onSelectionChanged)(NSIndexSet* selected);
+-(instancetype)initWithTitle:(NSString*)title
+                       items:(NSArray<NSString*>*)items
+              initialSelected:(NSIndexSet*)initialSelected
+                         multi:(BOOL)multi
+                       onPick:(void(^)(NSIndexSet*))onPick;
 @end
 
-@protocol MultiSelectMenuModalViewControllerDelegate <NSObject>
--(void)multiSelectMenuModalViewControllerDonePressed:(MultiSelectMenuModalViewController*)multi_select_menu_modal_view_controller;
-@end
+@implementation FilterPickerViewController
 
-@interface SingleSelectMenuAction : NSObject
-@property(nonatomic, retain) NSString* title;
-@property(nonatomic, copy) void(^handler)();
-
-+(instancetype)actionWithTitle:(NSString*)title handler:(void(^)())handler;
--(instancetype)initWithTitle:(NSString*)title handler:(void(^)())handler;
-
--(void)callHandler;
-@end
-
-@interface MultiSelectMenuAction : NSObject
-@property(nonatomic, retain) NSString* title;
-@property(nonatomic, copy) void(^handler)(BOOL selected);
-@property(nonatomic) BOOL selected;
-
-+(instancetype)actionWithTitle:(NSString*)title handler:(void(^)(BOOL selected))handler;
--(instancetype)initWithTitle:(NSString*)title handler:(void(^)(BOOL selected))handler;
-
--(void)switchSelected;
--(void)callHandler;
-@end
-
-@interface SingleSelectMenuButton : UIView
-@property(nonatomic, retain) NSString* title;
-@property(nonatomic, retain) UILabel* label;
-@property(nonatomic, retain) UIButton* button;
-@property(nonatomic, retain, readonly) NSArray<SingleSelectMenuAction*>* actions;
-
--(instancetype)initWithTitle:(NSString*)title buttonMenuActions:(NSArray<SingleSelectMenuAction*>*)actions;
-
--(void)updateActions:(NSArray<SingleSelectMenuAction*>*)actions;
-@end
-
-@interface MultiSelectMenuButton : UIView
-@property(nonatomic, retain) NSString* title;
-@property(nonatomic, retain) UILabel* label;
-@property(nonatomic, retain) UIButton* button;
-@property(nonatomic, retain, readonly) NSArray<MultiSelectMenuAction*>* actions;
-@property(nonatomic, weak) id<MultiSelectMenuButtonPresenter> presenter;
-
--(instancetype)initWithTitle:(NSString*)locale_title buttonMenuActions:(NSArray<MultiSelectMenuAction*>*)actions;
-
--(void)updateActions:(NSArray<MultiSelectMenuAction*>*)actions;
-@end
-
-@interface MultiSelectMenuModalTableViewCell : UITableViewCell
-@property(nonatomic, retain) UIImageView* checkbox_image_view;
-@property(nonatomic, retain) UILabel* name_label;
-
-+(NSString*)getIdentifier;
--(void)setCheckboxed:(BOOL)selected;
--(void)setName:(NSString*)name;
-@end
-
-@interface MultiSelectMenuModalViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
-@property(nonatomic, retain) UIVisualEffectView* blur_effect_view;
-@property(nonatomic, retain) UIView* content_view;
-@property(nonatomic, retain) UILabel* title_label;
-@property(nonatomic, retain) UITableView* actions_table_view;
-@property(nonatomic, retain) UIButton* select_all_button;
-@property(nonatomic, retain) UIButton* done_button;
-@property(nonatomic, retain, readonly) NSArray<MultiSelectMenuAction*>* actions;
-@property(nonatomic, retain) NSString* modal_title;
-@property(nonatomic) NSInteger selected_count;
-@property(nonatomic, retain) id<MultiSelectMenuModalViewControllerDelegate> delegate;
-
--(instancetype)initWithTitle:(NSString*)title actions:(NSArray<MultiSelectMenuAction*>*)actions;
--(void)updateActions:(NSArray<MultiSelectMenuAction*>*)actions;
-@end
-
-@interface FilterViewController () <MultiSelectMenuButtonPresenter> {
-    anixart::requests::FilterRequest _filter_request;
-    std::vector<anixart::EpisodeType::Ptr> _episode_types;
-}
-@property(nonatomic, strong) LibanixartApi* api_proxy;
-@property(nonatomic, retain) UIScrollView* scroll_view;
-@property(nonatomic, retain) UIStackView* stack_view;
-@property(nonatomic, retain) SingleSelectMenuButton* status_select_button;
-@property(nonatomic, retain) SingleSelectMenuButton* category_select_button;
-@property(nonatomic, retain) MultiSelectMenuButton* genres_select_button;
-@property(nonatomic, retain) UIButton* genres_exclude_mode_button;
-@property(nonatomic, retain) SingleSelectMenuButton* country_select_button;
-@property(nonatomic, retain) MultiSelectMenuButton* types_select_button;
-@property(nonatomic, retain) SingleSelectMenuButton* studio_select_button;
-@property(nonatomic, retain) SingleSelectMenuButton* season_select_button;
-@property(nonatomic, retain) SingleSelectMenuButton* episode_count_select_button;
-@property(nonatomic, retain) SingleSelectMenuButton* episode_duration_select_button;
-@property(nonatomic, retain) MultiSelectMenuButton* list_exclude_select_button;
-@property(nonatomic, retain) MultiSelectMenuButton* age_rating_select_button;
-@property(nonatomic, retain) SingleSelectMenuButton* sort_select_button;
-@property(nonatomic, retain) UIButton* search_button;
-
-@end
-
-@implementation SingleSelectMenuAction
-
-+(instancetype)actionWithTitle:(NSString*)title handler:(void(^)())handler {
-    return [[SingleSelectMenuAction alloc] initWithTitle:title handler:handler];
-}
--(instancetype)initWithTitle:(NSString*)title handler:(void(^)())handler {
-    self = [super init];
-    
-    _handler = [handler copy];
-    _title = title;
-    
-    return self;
-}
-
--(void)callHandler {
-    _handler();
-}
-@end
-
-@implementation MultiSelectMenuAction
-+(instancetype)actionWithTitle:(NSString*)title handler:(void(^)(BOOL selected))handler {
-    return [[MultiSelectMenuAction alloc] initWithTitle:title handler:handler];
-}
--(instancetype)initWithTitle:(NSString*)title handler:(void(^)(BOOL selected))handler {
-    self = [super init];
-    
-    _handler = [handler copy];
-    _title = title;
-    
-    return self;
-}
-
--(void)switchSelected {
-    _selected = !_selected;
-}
--(void)callHandler {
-    _handler(_selected);
-}
-@end
-
-@implementation SingleSelectMenuButton
--(instancetype)initWithTitle:(NSString*)title buttonMenuActions:(NSArray<SingleSelectMenuAction*>*)actions {
-    self = [super init];
-    
-    _title = title;
-    _actions = actions;
-    
-    [self setup];
-    [self setupLayout];
-    
-    [self updateActions:actions];
-    
-    return self;
-}
-
--(void)setup {
-    _label = [UILabel new];
-    _label.text = _title;
-    _button = [UIButton new];
-    [_button setTitle:_actions[0].title forState:UIControlStateNormal];
-    _button.showsMenuAsPrimaryAction = YES;
-    
-    [self addSubview:_label];
-    [self addSubview:_button];
-    
-    _label.translatesAutoresizingMaskIntoConstraints = NO;
-    _button.translatesAutoresizingMaskIntoConstraints = NO;
-    [NSLayoutConstraint activateConstraints:@[
-        [_label.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:10],
-        [_label.topAnchor constraintEqualToAnchor:self.topAnchor],
-
-        [_button.topAnchor constraintEqualToAnchor:_label.bottomAnchor],
-        [_button.widthAnchor constraintEqualToAnchor:self.widthAnchor],
-        [_button.heightAnchor constraintEqualToConstant:50],
-        [_button.bottomAnchor constraintEqualToAnchor:self.bottomAnchor]
-    ]];
-    [_label sizeToFit];
-}
--(void)setupLayout {
-    _label.textColor = [AppColorProvider textColor];
-    _button.layer.cornerRadius = 8;
-    [_button setTitleColor:[AppColorProvider textColor] forState:UIControlStateNormal];
-    _button.backgroundColor = [AppColorProvider foregroundColor1];
-    self.backgroundColor = [UIColor clearColor];
-}
--(void)updateActions:(NSArray<SingleSelectMenuAction*>*)actions {
-    _actions = actions;
-    NSMutableArray<UIAction*>* menu_actions = [NSMutableArray arrayWithCapacity:[actions count]];
-    int i = 0;
-    for (SingleSelectMenuAction* titled_action : actions) {
-        menu_actions[i++] = [UIAction actionWithTitle:titled_action.title image:nil identifier:nil handler:^(UIAction* action) {
-            [self.button setTitle:titled_action.title forState:UIControlStateNormal];
-            [titled_action callHandler];
-        }];
-    }
-    UIMenu* menu = [UIMenu menuWithTitle:actions[0].title children:menu_actions];
-    [_button setMenu:menu];
-}
-@end
-
-@implementation MultiSelectMenuButton
--(instancetype)initWithTitle:(NSString*)title buttonMenuActions:(NSArray<MultiSelectMenuAction*>*)actions {
-    self = [super init];
-    
-    _title = title;
-    _actions = actions;
-    
-    [self setupView];
-    [self setupLayout];
-    
-    return self;
-}
-
--(void)setupView {
-    _label = [UILabel new];
-    _label.text = _title;
-    _button = [UIButton new];
-    [_button setTitle:_title forState:UIControlStateNormal];
-    [_button addTarget:self action:@selector(onButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    _button.showsMenuAsPrimaryAction = YES;
-    _button.layer.cornerRadius = 8;
-    
-    [self addSubview:_label];
-    [self addSubview:_button];
-    
-    _label.translatesAutoresizingMaskIntoConstraints = NO;
-    _button.translatesAutoresizingMaskIntoConstraints = NO;
-    [NSLayoutConstraint activateConstraints:@[
-        [_label.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:10],
-        [_label.topAnchor constraintEqualToAnchor:self.topAnchor],
-        
-        [_button.topAnchor constraintEqualToAnchor:_label.bottomAnchor],
-        [_button.widthAnchor constraintEqualToAnchor:self.widthAnchor],
-        [_button.heightAnchor constraintEqualToConstant:50],
-        [_button.bottomAnchor constraintEqualToAnchor:self.bottomAnchor]
-    ]];
-    [_label sizeToFit];
-}
--(void)setupLayout {
-    _label.textColor = [AppColorProvider textColor];
-    [_button setTitleColor:[AppColorProvider textColor] forState:UIControlStateNormal];
-    _button.backgroundColor = [AppColorProvider foregroundColor1];
-    self.backgroundColor = [UIColor clearColor];
-}
--(void)updateActions:(NSArray<MultiSelectMenuAction*>*)actions {
-    _actions = actions;
-}
-
--(IBAction)onButtonPressed:(UIButton*)sender {
-    MultiSelectMenuModalViewController* view_controller = [[MultiSelectMenuModalViewController alloc] initWithTitle:_title actions:_actions];
-    
-    [_presenter presentMultiSelectViewController:view_controller];
-}
-@end
-
-@implementation MultiSelectMenuModalTableViewCell
-
-+(NSString*)getIdentifier {
-    return @"MultiSelectMenuModalTableViewCell";
-}
-
--(instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuse_identifier {
-    self = [super initWithStyle:style reuseIdentifier:reuse_identifier];
-    
-    [self setup];
-    [self setupLayout];
-    
-    return self;
-}
-
--(void)setup {
-    _checkbox_image_view = [UIImageView new];
-    _name_label = [UILabel new];
-    _name_label.numberOfLines = 1;
-    
-    [self addSubview:_checkbox_image_view];
-    [self addSubview:_name_label];
-    
-    _checkbox_image_view.translatesAutoresizingMaskIntoConstraints = NO;
-    _name_label.translatesAutoresizingMaskIntoConstraints = NO;
-    [NSLayoutConstraint activateConstraints:@[
-        [_checkbox_image_view.centerYAnchor constraintEqualToAnchor:self.layoutMarginsGuide.centerYAnchor],
-        [_checkbox_image_view.trailingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.trailingAnchor],
-        [_checkbox_image_view.widthAnchor constraintEqualToAnchor:self.layoutMarginsGuide.heightAnchor],
-        [_checkbox_image_view.heightAnchor constraintEqualToAnchor:self.layoutMarginsGuide.heightAnchor],
-        
-        [_name_label.centerYAnchor constraintEqualToAnchor:self.layoutMarginsGuide.centerYAnchor],
-        [_name_label.leadingAnchor constraintEqualToAnchor:self.layoutMarginsGuide.leadingAnchor],
-        [_name_label.trailingAnchor constraintEqualToAnchor:_checkbox_image_view.leadingAnchor constant:-5],
-        [_name_label.heightAnchor constraintEqualToAnchor:self.layoutMarginsGuide.heightAnchor]
-    ]];
-}
-
--(void)setupLayout {
-    self.backgroundColor = [UIColor clearColor];
-    _checkbox_image_view.tintColor = [UIColor systemGrayColor];
-    _name_label.textColor = [AppColorProvider textColor];
-}
-
--(void)setCheckboxed:(BOOL)selected {
-    if (selected) {
-        _checkbox_image_view.image = [UIImage systemImageNamed:@"checkmark.square"];
-        _checkbox_image_view.tintColor = [AppColorProvider primaryColor];
-    } else {
-        _checkbox_image_view.image = [UIImage systemImageNamed:@"square"];
-        _checkbox_image_view.tintColor = [UIColor systemGrayColor];
-    }
-}
--(void)setName:(NSString*)name {
-    _name_label.text = name;
-}
-
-@end
-
-@implementation MultiSelectMenuModalViewController
-
--(instancetype)initWithTitle:(NSString *)title actions:(NSArray<MultiSelectMenuAction*>*)actions {
-    self = [super init];
-    
-    _selected_count = 0;
-    _actions = actions;
-    _modal_title = title;
-    
-    for (MultiSelectMenuAction* action : _actions) {
-        if (action.selected) {
-            _selected_count++;
-        }
-    }
-    
-    self.modalPresentationStyle = UIModalPresentationOverFullScreen;
-    
+-(instancetype)initWithTitle:(NSString*)title
+                       items:(NSArray<NSString*>*)items
+              initialSelected:(NSIndexSet*)initialSelected
+                         multi:(BOOL)multi
+                       onPick:(void(^)(NSIndexSet*))onPick {
+    self = [super initWithStyle:UITableViewStyleInsetGrouped];
+    if (!self) return nil;
+    self.title = title;
+    _items = [items copy];
+    _multi = multi;
+    _selected_indices = initialSelected ? [initialSelected mutableCopy] : [NSMutableIndexSet new];
+    _onSelectionChanged = [onPick copy];
     return self;
 }
 
 -(void)viewDidLoad {
     [super viewDidLoad];
-    
-    [self setup];
-    [self setupLayout];
-}
--(void)setup {
-    _blur_effect_view = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleRegular]];
-    
-    _content_view = [UIView new];
-    _content_view.layoutMargins = UIEdgeInsetsMake(12, 12, 12, 12);
-    _content_view.layer.cornerRadius = 12;
-    
-    _title_label = [UILabel new];
-    _title_label.numberOfLines = 1;
-    _title_label.text = _modal_title;
-    
-    _actions_table_view = [UITableView new];
-    _actions_table_view.delegate = self;
-    _actions_table_view.dataSource = self;
-    [_actions_table_view registerClass:MultiSelectMenuModalTableViewCell.class forCellReuseIdentifier:[MultiSelectMenuModalTableViewCell getIdentifier]];
-    _actions_table_view.layer.cornerRadius = 8;
-    
-    _select_all_button = [UIButton new];
-    [_select_all_button addTarget:self action:@selector(onSelectAllPressed:) forControlEvents:UIControlEventTouchUpInside];
-    [_select_all_button setImage:[UIImage systemImageNamed:@"square"] forState:UIControlStateNormal];
-    _select_all_button.contentVerticalAlignment = UIControlContentVerticalAlignmentFill;
-    _select_all_button.contentHorizontalAlignment = UIControlContentHorizontalAlignmentFill;
-    
-    _done_button = [UIButton new];
-    [_done_button addTarget:self action:@selector(onDoneButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    [_done_button setTitle:NSLocalizedString(@"app.filter.multi_select.done", "") forState:UIControlStateNormal];
-    _done_button.layer.cornerRadius = 8;
-    
-    [self.view addSubview:_blur_effect_view];
-    [self.view addSubview:_content_view];
-    [self.view addSubview:_title_label];
-    [self.view addSubview:_select_all_button];
-    [self.view addSubview:_actions_table_view];
-    [self.view addSubview:_done_button];
-    
-    _blur_effect_view.translatesAutoresizingMaskIntoConstraints = NO;
-    _content_view.translatesAutoresizingMaskIntoConstraints = NO;
-    _title_label.translatesAutoresizingMaskIntoConstraints = NO;
-    _actions_table_view.translatesAutoresizingMaskIntoConstraints = NO;
-    _select_all_button.translatesAutoresizingMaskIntoConstraints = NO;
-    _done_button.translatesAutoresizingMaskIntoConstraints = NO;
-    [NSLayoutConstraint activateConstraints:@[
-        [_blur_effect_view.topAnchor constraintEqualToAnchor:self.view.topAnchor],
-        [_blur_effect_view.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-        [_blur_effect_view.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
-        [_blur_effect_view.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
-        
-        [_content_view.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
-        [_content_view.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor],
-        [_content_view.widthAnchor constraintEqualToAnchor:self.view.widthAnchor multiplier:0.75],
-        [_content_view.heightAnchor constraintEqualToAnchor:self.view.heightAnchor multiplier:0.65],
-        
-        [_select_all_button.topAnchor constraintEqualToAnchor:_content_view.layoutMarginsGuide.topAnchor],
-        [_select_all_button.trailingAnchor constraintEqualToAnchor:_content_view.layoutMarginsGuide.trailingAnchor constant:-16],
-        [_select_all_button.widthAnchor constraintEqualToConstant:28],
-        [_select_all_button.heightAnchor constraintEqualToConstant:25],
-        
-        [_title_label.topAnchor constraintEqualToAnchor:_content_view.layoutMarginsGuide.topAnchor],
-        [_title_label.leadingAnchor constraintEqualToAnchor:_content_view.layoutMarginsGuide.leadingAnchor],
-        [_title_label.trailingAnchor constraintEqualToAnchor:_select_all_button.leadingAnchor],
-        [_title_label.bottomAnchor constraintEqualToAnchor:_select_all_button.bottomAnchor],
-        
-        [_done_button.bottomAnchor constraintEqualToAnchor:_content_view.layoutMarginsGuide.bottomAnchor],
-        [_done_button.leadingAnchor constraintEqualToAnchor:_content_view.layoutMarginsGuide.leadingAnchor],
-        [_done_button.trailingAnchor constraintEqualToAnchor:_content_view.layoutMarginsGuide.trailingAnchor],
-        [_done_button.heightAnchor constraintEqualToConstant:50],
-        
-        [_actions_table_view.topAnchor constraintEqualToAnchor:_title_label.bottomAnchor constant:10],
-        [_actions_table_view.leadingAnchor constraintEqualToAnchor:_content_view.layoutMarginsGuide.leadingAnchor],
-        [_actions_table_view.trailingAnchor constraintEqualToAnchor:_content_view.layoutMarginsGuide.trailingAnchor],
-        [_actions_table_view.bottomAnchor constraintEqualToAnchor:_done_button.topAnchor constant:-10]
-    ]];
-}
--(void)setupLayout {
-    self.view.backgroundColor = [UIColor clearColor];
-    _content_view.backgroundColor = [AppColorProvider backgroundColor];
-    _title_label.textColor = [AppColorProvider textColor];
-    _actions_table_view.backgroundColor = [AppColorProvider foregroundColor1];
-    [self updateSelectedCount];
-    _done_button.backgroundColor = [AppColorProvider primaryColor];
+    self.view.backgroundColor = [AppColorProvider backgroundColor];
+    self.tableView.backgroundColor = UIColor.clearColor;
+    [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"row"];
 }
 
--(NSInteger)tableView:(UITableView*)table_view numberOfRowsInSection:(NSInteger)section {
-    return [_actions count];
-}
--(CGFloat)tableView:(UITableView*)table_view heightForRowAtIndexPath:(NSIndexPath*)index_path {
-    return 50;
-}
--(UITableViewCell*)tableView:(UITableView*)table_view cellForRowAtIndexPath:(NSIndexPath*)index_path {
-    MultiSelectMenuModalTableViewCell* cell = [table_view dequeueReusableCellWithIdentifier:[MultiSelectMenuModalTableViewCell getIdentifier] forIndexPath:index_path];
-    NSInteger index = [index_path item];
-    MultiSelectMenuAction* action = _actions[index];
+-(NSInteger)tableView:(UITableView*)tv numberOfRowsInSection:(NSInteger)section { return _items.count; }
 
-    [cell setName:action.title];
-    [cell setCheckboxed:action.selected];
-    
+-(UITableViewCell*)tableView:(UITableView*)tv cellForRowAtIndexPath:(NSIndexPath*)ip {
+    UITableViewCell* cell = [tv dequeueReusableCellWithIdentifier:@"row" forIndexPath:ip];
+    UIListContentConfiguration* content = cell.defaultContentConfiguration;
+    content.text = _items[ip.row];
+    content.textProperties.font = [UIFont app_fontForStyle:AppTextStyleBody];
+    content.textProperties.color = [AppColorProvider textColor];
+    cell.contentConfiguration = content;
+    cell.accessoryType = [_selected_indices containsIndex:ip.row]
+        ? UITableViewCellAccessoryCheckmark
+        : UITableViewCellAccessoryNone;
+    cell.tintColor = [AppColorProvider primaryColor];
+    cell.backgroundColor = [AppColorProvider foregroundColor1];
     return cell;
 }
 
--(void)tableView:(UITableView*)table_view didSelectRowAtIndexPath:(NSIndexPath*)index_path {
-    [table_view deselectRowAtIndexPath:index_path animated:YES];
-    NSInteger index = [index_path item];
-    MultiSelectMenuModalTableViewCell* cell = [table_view cellForRowAtIndexPath:index_path];
-    MultiSelectMenuAction* action = _actions[index];
-    
-    [action switchSelected];
-    if (action.selected) {
-        _selected_count++;
-    } else {
-        _selected_count--;
+-(void)tableView:(UITableView*)tv didSelectRowAtIndexPath:(NSIndexPath*)ip {
+    [tv deselectRowAtIndexPath:ip animated:YES];
+    NSInteger i = ip.row;
+    if (_multi) {
+        if ([_selected_indices containsIndex:i]) [_selected_indices removeIndex:i];
+        else                                     [_selected_indices addIndex:i];
+        [tv reloadRowsAtIndexPaths:@[ip] withRowAnimation:UITableViewRowAnimationNone];
+        if (_onSelectionChanged) _onSelectionChanged(_selected_indices);
+        return;
     }
-    [self updateSelectedCount];
-    
-    [cell setCheckboxed:action.selected];
-    [action callHandler];
-}
-
--(IBAction)onSelectAllPressed:(UIButton*)sender {
-    BOOL to_be_selected = _selected_count < [_actions count];
-    _selected_count = to_be_selected ? [_actions count] : 0;
-    
-    for (size_t i = 0; i < [_actions count]; ++i) {
-        MultiSelectMenuAction* action = _actions[i];
-        
-        BOOL was_selected = action.selected;
-        action.selected = to_be_selected;
-        if (was_selected != to_be_selected) {
-            [action callHandler];
-        }
-    }
-    [_actions_table_view reloadData];
-    [self updateSelectedCount];
-}
--(IBAction)onDoneButtonPressed:(UIButton*)sender {
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-    [_delegate multiSelectMenuModalViewControllerDonePressed:self];
-}
-
--(void)updateSelectedCount {
-    if (_selected_count <= 0) {
-        [_select_all_button setImage:[UIImage systemImageNamed:@"square"] forState:UIControlStateNormal];
-        _select_all_button.tintColor = [UIColor systemGrayColor];
-    }
-    else if (_selected_count >= [_actions count]) {
-        [_select_all_button setImage:[UIImage systemImageNamed:@"checkmark.square"] forState:UIControlStateNormal];
-        _select_all_button.tintColor = [AppColorProvider primaryColor];
-    }
-    else {
-        [_select_all_button setImage:[UIImage systemImageNamed:@"dot.square"] forState:UIControlStateNormal];
-        _select_all_button.tintColor = [AppColorProvider primaryColor];
-    }
-}
-
--(void)updateActions:(NSArray<MultiSelectMenuAction*>*)actions {
-    // TODO
+    [_selected_indices removeAllIndexes];
+    [_selected_indices addIndex:i];
+    if (_onSelectionChanged) _onSelectionChanged(_selected_indices);
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 @end
+
+
+#pragma mark - FilterRow
+
+/// Filter row identity. The table view controller switches on this enum to
+/// supply the row's current value, accessory, and tap handler — keeps state
+/// access direct without weak-self gymnastics.
+typedef NS_ENUM(NSInteger, FilterRowID) {
+    FilterRowStatus,
+    FilterRowCategory,
+    FilterRowSeason,
+    FilterRowGenres,
+    FilterRowGenresExcludeMode,
+    FilterRowCountry,
+    FilterRowStudio,
+    FilterRowEpisodeCount,
+    FilterRowEpisodeDuration,
+    FilterRowTypes,
+    FilterRowAgeRatings,
+    FilterRowListExclusions,
+    FilterRowSort
+};
+
+@interface FilterRow : NSObject
+@property(nonatomic, copy) NSString* title;
+@property(nonatomic) FilterRowID identifier;
++(instancetype)title:(NSString*)title id:(FilterRowID)identifier;
+@end
+
+@implementation FilterRow
++(instancetype)title:(NSString*)title id:(FilterRowID)identifier {
+    FilterRow* r = [FilterRow new];
+    r.title = title;
+    r.identifier = identifier;
+    return r;
+}
+@end
+
+
+#pragma mark - FilterViewController
+
+@interface FilterViewController () <UITableViewDataSource, UITableViewDelegate> {
+    anixart::requests::FilterRequest _filter_request;
+    std::vector<anixart::EpisodeType::Ptr> _episode_types;
+}
+@property(nonatomic, strong) LibanixartApi*    api_proxy;
+@property(nonatomic, retain) UITableView*      table_view;
+@property(nonatomic, retain) UIButton*         apply_button;
+@property(nonatomic, retain) NSArray<NSString*>* section_titles;
+@property(nonatomic, retain) NSArray<NSArray<FilterRow*>*>* rows_by_section;
+@end
+
 
 @implementation FilterViewController
 
 -(void)viewDidLoad {
     [super viewDidLoad];
-    
     _api_proxy = [LibanixartApi sharedInstance];
-    
-    [self setup];
-    [self setupLayout];
-}
-
--(void)setup {
-    _scroll_view = [UIScrollView new];
-    _scroll_view.contentInset = UIEdgeInsetsMake(12, 0, 10, 0);
-    _scroll_view.clipsToBounds = NO;
-    
-    _stack_view = [UIStackView new];
-    _stack_view.distribution = UIStackViewDistributionEqualSpacing;
-    _stack_view.axis = UILayoutConstraintAxisVertical;
-    _stack_view.alignment = UIStackViewAlignmentFill;
-    _stack_view.spacing = 15;
-    _stack_view.clipsToBounds = YES;
-    _stack_view.directionalLayoutMargins = NSDirectionalEdgeInsetsMake(0, 15, 0, 15);
-    _stack_view.layoutMarginsRelativeArrangement = YES;
-    
-    _status_select_button = [[SingleSelectMenuButton alloc] initWithTitle:NSLocalizedString(@"app.filter.status", "") buttonMenuActions:@[
-        [SingleSelectMenuAction actionWithTitle:NSLocalizedString(@"app.filter.selection.none", "") handler:^{
-            [self onStatusMenuItemSelected:anixart::Release::Status::Unknown];
-        }],
-        [SingleSelectMenuAction actionWithTitle:[ReleasesPageableDataProvider getStatusNameFor:anixart::Release::Status::Finished] handler:^{
-            [self onStatusMenuItemSelected:anixart::Release::Status::Finished];
-        }],
-        [SingleSelectMenuAction actionWithTitle:[ReleasesPageableDataProvider getStatusNameFor:anixart::Release::Status::Ongoing] handler:^{
-            [self onStatusMenuItemSelected:anixart::Release::Status::Ongoing];
-        }],
-        [SingleSelectMenuAction actionWithTitle:[ReleasesPageableDataProvider getStatusNameFor:anixart::Release::Status::Upcoming] handler:^{
-            [self onStatusMenuItemSelected:anixart::Release::Status::Upcoming];
-        }]
-    ]];
-
-    _category_select_button = [[SingleSelectMenuButton alloc] initWithTitle:NSLocalizedString(@"app.filter.category", "") buttonMenuActions:@[
-        [SingleSelectMenuAction actionWithTitle:NSLocalizedString(@"app.filter.selection.none", "") handler:^{
-            [self onCategoryMenuItemSelected:anixart::Release::Category::Unknown];
-        }],
-        [SingleSelectMenuAction actionWithTitle:[ReleasesPageableDataProvider getCategoryNameFor:anixart::Release::Category::Series] handler:^{
-            [self onCategoryMenuItemSelected:anixart::Release::Category::Series];
-        }],
-        [SingleSelectMenuAction actionWithTitle:[ReleasesPageableDataProvider getCategoryNameFor:anixart::Release::Category::Movies] handler:^{
-            [self onCategoryMenuItemSelected:anixart::Release::Category::Movies];
-        }],
-        [SingleSelectMenuAction actionWithTitle:[ReleasesPageableDataProvider getCategoryNameFor:anixart::Release::Category::Ova] handler:^{
-            [self onCategoryMenuItemSelected:anixart::Release::Category::Ova];
-        }]
-    ]];
-    
-    _genres_select_button = [[MultiSelectMenuButton alloc] initWithTitle:NSLocalizedString(@"app.filter.genres", "") buttonMenuActions:[self createGenreActions]];
-    
-    _genres_exclude_mode_button = [UIButton new];
-    [_genres_exclude_mode_button setImage:[UIImage systemImageNamed:@"square.slash"] forState:UIControlStateNormal];
-    [_genres_exclude_mode_button addTarget:self action:@selector(onGenresExcludeModePressed:) forControlEvents:UIControlEventTouchUpInside];
-    _genres_exclude_mode_button.contentVerticalAlignment = UIControlContentVerticalAlignmentFill;
-    _genres_exclude_mode_button.contentHorizontalAlignment = UIControlContentHorizontalAlignmentFill;
-    
-    _country_select_button = [[SingleSelectMenuButton alloc] initWithTitle:NSLocalizedString(@"app.filter.country", "") buttonMenuActions:@[
-        [SingleSelectMenuAction actionWithTitle:NSLocalizedString(@"app.filter.selection.none", "") handler:^{
-            [self onCountryMenuItemSelected:nil];
-        }],
-        [SingleSelectMenuAction actionWithTitle:NSLocalizedString(@"app.filter.country.japan", "") handler:^{
-            [self onCountryMenuItemSelected:@"Япония"];
-        }],
-        [SingleSelectMenuAction actionWithTitle:NSLocalizedString(@"app.filter.country.china", "") handler:^{
-            [self onCountryMenuItemSelected:@"Китай"];
-        }]
-    ]];
-    
-    _types_select_button = [[MultiSelectMenuButton alloc] initWithTitle:NSLocalizedString(@"app.filter.types", "") buttonMenuActions:@[]];
-    
-    _studio_select_button = [[SingleSelectMenuButton alloc] initWithTitle:NSLocalizedString(@"app.filter.studio", "") buttonMenuActions:[self createStudioActions]];
-    
-    _season_select_button = [[SingleSelectMenuButton alloc] initWithTitle:NSLocalizedString(@"app.filter.season", "") buttonMenuActions:@[
-        [SingleSelectMenuAction actionWithTitle:NSLocalizedString(@"app.filter.selection.none", "") handler:^{
-        [self onSeasonMenuItemSelected:anixart::Release::Season::Unknown];
-        }],
-        [SingleSelectMenuAction actionWithTitle:[ReleasesPageableDataProvider getSeasonNameFor:anixart::Release::Season::Winter] handler:^{
-        [self onSeasonMenuItemSelected:anixart::Release::Season::Winter];
-        }],
-        [SingleSelectMenuAction actionWithTitle:[ReleasesPageableDataProvider getSeasonNameFor:anixart::Release::Season::Spring] handler:^{
-        [self onSeasonMenuItemSelected:anixart::Release::Season::Spring];
-        }],
-        [SingleSelectMenuAction actionWithTitle:[ReleasesPageableDataProvider getSeasonNameFor:anixart::Release::Season::Summer] handler:^{
-        [self onSeasonMenuItemSelected:anixart::Release::Season::Summer];
-        }],
-        [SingleSelectMenuAction actionWithTitle:[ReleasesPageableDataProvider getSeasonNameFor:anixart::Release::Season::Fall] handler:^{
-            [self onSeasonMenuItemSelected:anixart::Release::Season::Fall];
-        }]
-    ]];
-    
-    _episode_count_select_button = [[SingleSelectMenuButton alloc] initWithTitle:NSLocalizedString(@"app.filter.episodes_count", "") buttonMenuActions:@[
-        [SingleSelectMenuAction actionWithTitle:NSLocalizedString(@"app.filter.selection.none", "") handler:^{
-            [self onEpisodeCountMenuItemSelected:0];
-        }],
-        [SingleSelectMenuAction actionWithTitle:NSLocalizedString(@"app.filter.episodes_count.1_to_12", "") handler:^{
-            [self onEpisodeCountMenuItemSelected:1];
-        }],
-        [SingleSelectMenuAction actionWithTitle:NSLocalizedString(@"app.filter.episodes_count.13_to_24", "") handler:^{
-            [self onEpisodeCountMenuItemSelected:2];
-        }],
-        [SingleSelectMenuAction actionWithTitle:NSLocalizedString(@"app.filter.episodes_count.25_to_100", "") handler:^{
-            [self onEpisodeCountMenuItemSelected:3];
-        }],
-        [SingleSelectMenuAction actionWithTitle:NSLocalizedString(@"app.filter.episodes_count.100_plus", "") handler:^{
-            [self onEpisodeCountMenuItemSelected:4];
-        }]
-    ]];
-    
-    _episode_duration_select_button = [[SingleSelectMenuButton alloc] initWithTitle:NSLocalizedString(@"app.filter.episodes_duration", "") buttonMenuActions:@[
-        [SingleSelectMenuAction actionWithTitle:NSLocalizedString(@"app.filter.selection.none", "") handler:^{
-            [self onEpisodeDurationMenuItemSelected:0];
-        }],
-        [SingleSelectMenuAction actionWithTitle:NSLocalizedString(@"app.filter.episodes_duration.to_10", "") handler:^{
-            [self onEpisodeDurationMenuItemSelected:1];
-        }],
-        [SingleSelectMenuAction actionWithTitle:NSLocalizedString(@"app.filter.episodes_duration.to_30", "") handler:^{
-            [self onEpisodeDurationMenuItemSelected:2];
-        }],
-        [SingleSelectMenuAction actionWithTitle:NSLocalizedString(@"app.filter.episodes_duration.30_plus", "") handler:^{
-            [self onEpisodeDurationMenuItemSelected:3];
-        }]
-    ]];
-    
-    _list_exclude_select_button = [[MultiSelectMenuButton alloc] initWithTitle:NSLocalizedString(@"app.filter.list_exclude", "") buttonMenuActions:@[
-        [MultiSelectMenuAction actionWithTitle:[ProfileListsView getListName:anixart::Profile::List::Favorite] handler:^(BOOL selected) {
-            [self onProfileListExlusionMenuItemSelected:anixart::Profile::List::Favorite selected:selected];
-        }],
-        [MultiSelectMenuAction actionWithTitle:[ProfileListsView getListName:anixart::Profile::List::Watching] handler:^(BOOL selected) {
-            [self onProfileListExlusionMenuItemSelected:anixart::Profile::List::Watching selected:selected];
-        }],
-        [MultiSelectMenuAction actionWithTitle:[ProfileListsView getListName:anixart::Profile::List::Plan] handler:^(BOOL selected) {
-            [self onProfileListExlusionMenuItemSelected:anixart::Profile::List::Plan selected:selected];
-        }],
-        [MultiSelectMenuAction actionWithTitle:[ProfileListsView getListName:anixart::Profile::List::Watched] handler:^(BOOL selected) {
-            [self onProfileListExlusionMenuItemSelected:anixart::Profile::List::Watched selected:selected];
-        }],
-        [MultiSelectMenuAction actionWithTitle:[ProfileListsView getListName:anixart::Profile::List::HoldOn] handler:^(BOOL selected) {
-            [self onProfileListExlusionMenuItemSelected:anixart::Profile::List::HoldOn selected:selected];
-        }],
-        [MultiSelectMenuAction actionWithTitle:[ProfileListsView getListName:anixart::Profile::List::Dropped] handler:^(BOOL selected) {
-            [self onProfileListExlusionMenuItemSelected:anixart::Profile::List::Dropped selected:selected];
-        }]
-    ]];
-    
-    _age_rating_select_button = [[MultiSelectMenuButton alloc] initWithTitle:NSLocalizedString(@"app.filter.age_rating", "") buttonMenuActions:@[
-        [MultiSelectMenuAction actionWithTitle:[ReleasesPageableDataProvider getAgeRatingNameFor:anixart::Release::AgeRating::G] handler:^(BOOL selected) {
-            [self onAgeRatingMenuItemSelected:anixart::Release::AgeRating::G selected:selected];
-        }],
-        [MultiSelectMenuAction actionWithTitle:[ReleasesPageableDataProvider getAgeRatingNameFor:anixart::Release::AgeRating::PG6] handler:^(BOOL selected) {
-        [self onAgeRatingMenuItemSelected:anixart::Release::AgeRating::PG6 selected:selected];
-        }],
-        [MultiSelectMenuAction actionWithTitle:[ReleasesPageableDataProvider getAgeRatingNameFor:anixart::Release::AgeRating::PG12] handler:^(BOOL selected) {
-        [self onAgeRatingMenuItemSelected:anixart::Release::AgeRating::PG12 selected:selected];
-        }],
-        [MultiSelectMenuAction actionWithTitle:[ReleasesPageableDataProvider getAgeRatingNameFor:anixart::Release::AgeRating::R16] handler:^(BOOL selected) {
-        [self onAgeRatingMenuItemSelected:anixart::Release::AgeRating::R16 selected:selected];
-        }],
-        [MultiSelectMenuAction actionWithTitle:[ReleasesPageableDataProvider getAgeRatingNameFor:anixart::Release::AgeRating::R18] handler:^(BOOL selected) {
-        [self onAgeRatingMenuItemSelected:anixart::Release::AgeRating::R18 selected:selected];
-        }]
-    ]];
-    
-    _sort_select_button = [[SingleSelectMenuButton alloc] initWithTitle:NSLocalizedString(@"app.filter.sort.date_update", "") buttonMenuActions:@[
-        [SingleSelectMenuAction actionWithTitle:NSLocalizedString(@"app.filter.sort.date_update", "") handler:^{
-            [self onSortSelectMenuItemSelected:anixart::requests::FilterRequest::Sort::DateUpdate];
-        }],
-        [SingleSelectMenuAction actionWithTitle:NSLocalizedString(@"app.filter.sort.grade", "") handler:^{
-            [self onSortSelectMenuItemSelected:anixart::requests::FilterRequest::Sort::Grade];
-        }],
-        [SingleSelectMenuAction actionWithTitle:NSLocalizedString(@"app.filter.sort.year", "") handler:^{
-            [self onSortSelectMenuItemSelected:anixart::requests::FilterRequest::Sort::Year];
-        }],
-        [SingleSelectMenuAction actionWithTitle:NSLocalizedString(@"app.filter.sort.popular", "") handler:^{
-            [self onSortSelectMenuItemSelected:anixart::requests::FilterRequest::Sort::Popular];
-        }],
-    ]];
-    
-    _search_button = [UIButton new];
-    [_search_button setTitle:NSLocalizedString(@"app.filter.search", "") forState:UIControlStateNormal];
-    [_search_button addTarget:self action:@selector(onSearchButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    _search_button.layer.cornerRadius = 8;
-    
-    _genres_select_button.presenter = self;
-    _types_select_button.presenter = self;
-    _list_exclude_select_button.presenter = self;
-    _age_rating_select_button.presenter = self;
-    
-    [self.view addSubview:_scroll_view];
-    [_scroll_view addSubview:_stack_view];
-    [_stack_view addArrangedSubview:_status_select_button];
-    [_stack_view addArrangedSubview:_category_select_button];
-    [_stack_view addArrangedSubview:_genres_select_button];
-    [_genres_select_button.button addSubview:_genres_exclude_mode_button];
-    [_stack_view addArrangedSubview:_country_select_button];
-    [_stack_view addArrangedSubview:_types_select_button];
-    [_stack_view addArrangedSubview:_studio_select_button];
-    [_stack_view addArrangedSubview:_season_select_button];
-    [_stack_view addArrangedSubview:_episode_count_select_button];
-    [_stack_view addArrangedSubview:_episode_duration_select_button];
-    [_stack_view addArrangedSubview:_list_exclude_select_button];
-    [_stack_view addArrangedSubview:_age_rating_select_button];
-    [_stack_view addArrangedSubview:_sort_select_button];
-    [self.view addSubview:_search_button];
-    
-    _scroll_view.translatesAutoresizingMaskIntoConstraints = NO;
-    _stack_view.translatesAutoresizingMaskIntoConstraints = NO;
-    _status_select_button.translatesAutoresizingMaskIntoConstraints = NO;
-    _category_select_button.translatesAutoresizingMaskIntoConstraints = NO;
-    _genres_select_button.translatesAutoresizingMaskIntoConstraints = NO;
-    _genres_exclude_mode_button.translatesAutoresizingMaskIntoConstraints = NO;
-    _country_select_button.translatesAutoresizingMaskIntoConstraints = NO;
-    _types_select_button.translatesAutoresizingMaskIntoConstraints = NO;
-    _studio_select_button.translatesAutoresizingMaskIntoConstraints = NO;
-    _season_select_button.translatesAutoresizingMaskIntoConstraints = NO;
-    _episode_count_select_button.translatesAutoresizingMaskIntoConstraints = NO;
-    _episode_duration_select_button.translatesAutoresizingMaskIntoConstraints = NO;
-    _list_exclude_select_button.translatesAutoresizingMaskIntoConstraints = NO;
-    _age_rating_select_button.translatesAutoresizingMaskIntoConstraints = NO;
-    _sort_select_button.translatesAutoresizingMaskIntoConstraints = NO;
-    _search_button.translatesAutoresizingMaskIntoConstraints = NO;
-    
-    [NSLayoutConstraint activateConstraints:@[
-        [_scroll_view.topAnchor constraintEqualToAnchor:self.view.topAnchor],
-        [_scroll_view.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-        [_scroll_view.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
-        [_scroll_view.bottomAnchor constraintLessThanOrEqualToAnchor:self.view.bottomAnchor],
-        
-        [_stack_view.topAnchor constraintEqualToAnchor:_scroll_view.topAnchor],
-        [_stack_view.leadingAnchor constraintEqualToAnchor:_scroll_view.leadingAnchor],
-        [_stack_view.trailingAnchor constraintEqualToAnchor:_scroll_view.trailingAnchor],
-        [_stack_view.bottomAnchor constraintEqualToAnchor:_scroll_view.bottomAnchor],
-        [_stack_view.widthAnchor constraintEqualToAnchor:_scroll_view.widthAnchor],
-//        [_stack_view.heightAnchor constraintGreaterThanOrEqualToAnchor:_scroll_view.heightAnchor],
-        
-        [_genres_exclude_mode_button.centerYAnchor constraintEqualToAnchor:_genres_select_button.button.layoutMarginsGuide.centerYAnchor],
-        [_genres_exclude_mode_button.trailingAnchor constraintEqualToAnchor:_genres_select_button.button.layoutMarginsGuide.trailingAnchor],
-        [_genres_exclude_mode_button.widthAnchor constraintEqualToAnchor:_genres_select_button.button.layoutMarginsGuide.heightAnchor],
-        [_genres_exclude_mode_button.heightAnchor constraintEqualToAnchor:_genres_select_button.button.layoutMarginsGuide.heightAnchor],
-        
-        [_search_button.topAnchor constraintEqualToAnchor:_scroll_view.bottomAnchor],
-        [_search_button.leadingAnchor constraintEqualToAnchor:_scroll_view.layoutMarginsGuide.leadingAnchor],
-        [_search_button.trailingAnchor constraintEqualToAnchor:_scroll_view.layoutMarginsGuide.trailingAnchor],
-        [_search_button.heightAnchor constraintEqualToConstant:50],
-        [_search_button.bottomAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.bottomAnchor],
-    ]];
-    
-    [self tryLoadEpisodeTypes];
-}
-
--(void)setupLayout {
     self.view.backgroundColor = [AppColorProvider backgroundColor];
-    _search_button.backgroundColor = [AppColorProvider primaryColor];
-    [self updateGenresExcludeButton];
+    self.title = @"Фильтр";
+    self.navigationItem.largeTitleDisplayMode = UINavigationItemLargeTitleDisplayModeNever;
+
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
+        initWithTitle:@"Сбросить"
+                style:UIBarButtonItemStylePlain
+               target:self
+               action:@selector(onResetTapped)];
+
+    [self buildRows];
+    [self setupTable];
+    [self setupApplyButton];
+    [self loadEpisodeTypes];
 }
 
--(NSArray<MultiSelectMenuAction*>*)createGenreActions {
-    NSArray<NSString*>* genres = [_api_proxy getGenresArray];
-    NSMutableArray<MultiSelectMenuAction*>* actions = [NSMutableArray arrayWithCapacity:[genres count]];
-    for (size_t i = 0; i < [genres count]; ++i) {
-        actions[i] = [MultiSelectMenuAction actionWithTitle:genres[i] handler:^(BOOL selected) {
-            [self onGenresMenuItemSelectedAtIndex:i selected:selected];
-        }];
+#pragma mark - Setup
+
+-(void)setupTable {
+    _table_view = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStyleInsetGrouped];
+    _table_view.dataSource = self;
+    _table_view.delegate = self;
+    _table_view.backgroundColor = UIColor.clearColor;
+    _table_view.rowHeight = UITableViewAutomaticDimension;
+    _table_view.estimatedRowHeight = 48;
+    [_table_view registerClass:UITableViewCell.class forCellReuseIdentifier:@"value"];
+
+    [self.view addSubview:_table_view];
+    _table_view.translatesAutoresizingMaskIntoConstraints = NO;
+    [NSLayoutConstraint activateConstraints:@[
+        [_table_view.topAnchor      constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor],
+        [_table_view.leadingAnchor  constraintEqualToAnchor:self.view.leadingAnchor],
+        [_table_view.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+    ]];
+}
+
+-(void)setupApplyButton {
+    UIView* bar = [UIView new];
+    bar.backgroundColor = [AppColorProvider backgroundColor];
+
+    _apply_button = [UIButton buttonWithType:UIButtonTypeSystem];
+    [_apply_button setTitle:@"Применить" forState:UIControlStateNormal];
+    [_apply_button setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
+    _apply_button.titleLabel.font = [UIFont app_fontForStyle:AppTextStyleHeadline];
+    _apply_button.backgroundColor = [AppColorProvider primaryColor];
+    _apply_button.layer.cornerRadius = AppRadiusLarge;
+    _apply_button.layer.cornerCurve = kCACornerCurveContinuous;
+    [_apply_button addTarget:self action:@selector(onApplyTapped) forControlEvents:UIControlEventTouchUpInside];
+
+    [self.view addSubview:bar];
+    [bar addSubview:_apply_button];
+
+    bar.translatesAutoresizingMaskIntoConstraints = NO;
+    _apply_button.translatesAutoresizingMaskIntoConstraints = NO;
+    [NSLayoutConstraint activateConstraints:@[
+        [bar.topAnchor       constraintEqualToAnchor:_table_view.bottomAnchor],
+        [bar.leadingAnchor   constraintEqualToAnchor:self.view.leadingAnchor],
+        [bar.trailingAnchor  constraintEqualToAnchor:self.view.trailingAnchor],
+        [bar.bottomAnchor    constraintEqualToAnchor:self.view.bottomAnchor],
+
+        [_apply_button.topAnchor      constraintEqualToAnchor:bar.topAnchor constant:AppSpacing8],
+        [_apply_button.bottomAnchor   constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-AppSpacing8],
+        [_apply_button.leadingAnchor  constraintEqualToAnchor:bar.leadingAnchor constant:AppSpacing16],
+        [_apply_button.trailingAnchor constraintEqualToAnchor:bar.trailingAnchor constant:-AppSpacing16],
+        [_apply_button.heightAnchor   constraintEqualToConstant:50],
+    ]];
+}
+
+#pragma mark - Rows / sections
+
+-(void)buildRows {
+    _section_titles = @[@"Категория", @"Жанры", @"Производство", @"Эпизоды", @"Возраст", @"Списки", @"Сортировка"];
+    _rows_by_section = @[
+        @[[FilterRow title:@"Статус"               id:FilterRowStatus],
+          [FilterRow title:@"Категория"            id:FilterRowCategory],
+          [FilterRow title:@"Сезон"                id:FilterRowSeason]],
+        @[[FilterRow title:@"Жанры"                id:FilterRowGenres],
+          [FilterRow title:@"Исключать выбранные"  id:FilterRowGenresExcludeMode]],
+        @[[FilterRow title:@"Страна"               id:FilterRowCountry],
+          [FilterRow title:@"Студия"               id:FilterRowStudio]],
+        @[[FilterRow title:@"Количество"           id:FilterRowEpisodeCount],
+          [FilterRow title:@"Длительность"         id:FilterRowEpisodeDuration],
+          [FilterRow title:@"Типы"                 id:FilterRowTypes]],
+        @[[FilterRow title:@"Возрастной рейтинг"   id:FilterRowAgeRatings]],
+        @[[FilterRow title:@"Исключить списки"     id:FilterRowListExclusions]],
+        @[[FilterRow title:@"Сортировка"           id:FilterRowSort]],
+    ];
+}
+
+#pragma mark - Value / accessory / tap dispatch (no blocks → no retain cycles)
+
+-(NSString*)valueTextForRow:(FilterRowID)rid {
+    switch (rid) {
+        case FilterRowStatus:
+            return _filter_request.status
+                ? [ReleasesPageableDataProvider getStatusNameFor:*_filter_request.status]
+                : @"Любой";
+        case FilterRowCategory:
+            return _filter_request.category
+                ? [ReleasesPageableDataProvider getCategoryNameFor:*_filter_request.category]
+                : @"Любая";
+        case FilterRowSeason:
+            return _filter_request.season
+                ? [ReleasesPageableDataProvider getSeasonNameFor:*_filter_request.season]
+                : @"Любой";
+        case FilterRowGenres:
+            return _filter_request.genres.empty()
+                ? @"Любые"
+                : [NSString stringWithFormat:@"%lu выбрано", (unsigned long)_filter_request.genres.size()];
+        case FilterRowGenresExcludeMode:
+            return nil;
+        case FilterRowCountry: {
+            if (!_filter_request.country) return @"Любая";
+            std::string copy = *_filter_request.country;
+            return TO_NSSTRING(copy);
+        }
+        case FilterRowStudio: {
+            if (!_filter_request.studio) return @"Любая";
+            std::string copy = *_filter_request.studio;
+            return TO_NSSTRING(copy);
+        }
+        case FilterRowEpisodeCount:    return [self episodeCountLabel];
+        case FilterRowEpisodeDuration: return [self episodeDurationLabel];
+        case FilterRowTypes:
+            return _filter_request.types.empty()
+                ? @"Любые"
+                : [NSString stringWithFormat:@"%lu выбрано", (unsigned long)_filter_request.types.size()];
+        case FilterRowAgeRatings:
+            return _filter_request.age_ratings.empty()
+                ? @"Любой"
+                : [NSString stringWithFormat:@"%lu выбрано", (unsigned long)_filter_request.age_ratings.size()];
+        case FilterRowListExclusions:
+            return _filter_request.profile_list_exclusions.empty()
+                ? @"Не исключать"
+                : [NSString stringWithFormat:@"%lu выбрано", (unsigned long)_filter_request.profile_list_exclusions.size()];
+        case FilterRowSort: return [self sortLabel];
     }
-    return actions;
+    return nil;
 }
 
--(NSArray<SingleSelectMenuAction*>*)createStudioActions {
-    NSArray<NSString*>* studios = [_api_proxy getStudiosArray];
-    NSMutableArray<SingleSelectMenuAction*>* actions = [NSMutableArray arrayWithCapacity:1 + [studios count]];
-    actions[0] = [SingleSelectMenuAction actionWithTitle:NSLocalizedString(@"app.filter.selection.none", "") handler:^{
-        [self onStudioMenuItemSelectedAtIndex:0];
+-(UIView*)accessoryForRow:(FilterRowID)rid {
+    if (rid != FilterRowGenresExcludeMode) return nil;
+    UISwitch* sw = [UISwitch new];
+    sw.on = _filter_request.is_genres_exclude_mode;
+    sw.onTintColor = [AppColorProvider primaryColor];
+    [sw addTarget:self action:@selector(onGenresExcludeModeSwitchChanged:) forControlEvents:UIControlEventValueChanged];
+    return sw;
+}
+
+-(void)onGenresExcludeModeSwitchChanged:(UISwitch*)sender {
+    _filter_request.is_genres_exclude_mode = sender.on;
+}
+
+-(void)handleTap:(FilterRowID)rid {
+    switch (rid) {
+        case FilterRowStatus:           [self pickStatus]; return;
+        case FilterRowCategory:         [self pickCategory]; return;
+        case FilterRowSeason:           [self pickSeason]; return;
+        case FilterRowGenres:           [self pickGenres]; return;
+        case FilterRowGenresExcludeMode: return;     // switch only — no tap
+        case FilterRowCountry:          [self pickCountry]; return;
+        case FilterRowStudio:           [self pickStudio]; return;
+        case FilterRowEpisodeCount:     [self pickEpisodeCount]; return;
+        case FilterRowEpisodeDuration:  [self pickEpisodeDuration]; return;
+        case FilterRowTypes:            [self pickTypes]; return;
+        case FilterRowAgeRatings:       [self pickAgeRatings]; return;
+        case FilterRowListExclusions:   [self pickProfileListExclusions]; return;
+        case FilterRowSort:             [self pickSort]; return;
+    }
+}
+
+#pragma mark - UITableViewDataSource / Delegate
+
+-(NSInteger)numberOfSectionsInTableView:(UITableView*)tv { return _rows_by_section.count; }
+-(NSInteger)tableView:(UITableView*)tv numberOfRowsInSection:(NSInteger)section { return _rows_by_section[section].count; }
+-(NSString*)tableView:(UITableView*)tv titleForHeaderInSection:(NSInteger)section { return _section_titles[section]; }
+
+-(UITableViewCell*)tableView:(UITableView*)tv cellForRowAtIndexPath:(NSIndexPath*)ip {
+    FilterRow* row = _rows_by_section[ip.section][ip.row];
+    UITableViewCell* cell = [tv dequeueReusableCellWithIdentifier:@"value" forIndexPath:ip];
+
+    UIListContentConfiguration* content = cell.defaultContentConfiguration;
+    content.text = row.title;
+    content.textProperties.font = [UIFont app_fontForStyle:AppTextStyleBody];
+    content.textProperties.color = [AppColorProvider textColor];
+    NSString* value = [self valueTextForRow:row.identifier];
+    if (value) {
+        content.secondaryText = value;
+        content.secondaryTextProperties.font = [UIFont app_fontForStyle:AppTextStyleBody];
+        content.secondaryTextProperties.color = [AppColorProvider textSecondaryColor];
+        content.prefersSideBySideTextAndSecondaryText = YES;
+    }
+    cell.contentConfiguration = content;
+    cell.backgroundColor = [AppColorProvider foregroundColor1];
+
+    UIView* accessory = [self accessoryForRow:row.identifier];
+    cell.accessoryView = accessory;
+    if (accessory) {
+        cell.accessoryType = UITableViewCellAccessoryNone;
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    } else {
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        cell.selectionStyle = UITableViewCellSelectionStyleDefault;
+    }
+    return cell;
+}
+
+-(void)tableView:(UITableView*)tv didSelectRowAtIndexPath:(NSIndexPath*)ip {
+    [tv deselectRowAtIndexPath:ip animated:YES];
+    FilterRow* row = _rows_by_section[ip.section][ip.row];
+    [self handleTap:row.identifier];
+}
+
+-(void)reloadAll {
+    [_table_view reloadData];
+}
+
+#pragma mark - Pickers
+
+-(void)pushPickerWithTitle:(NSString*)title
+                     items:(NSArray<NSString*>*)items
+                  selected:(NSIndexSet*)selected
+                     multi:(BOOL)multi
+                    onPick:(void(^)(NSIndexSet*))onPick {
+    FilterPickerViewController* vc = [[FilterPickerViewController alloc]
+        initWithTitle:title items:items initialSelected:selected multi:multi onPick:^(NSIndexSet* sel) {
+            onPick(sel);
+        }];
+    // For single-select pickers we reload the table on push back via VC lifecycle.
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+-(NSIndexSet*)singleIndexSet:(NSInteger)i {
+    return i >= 0 ? [NSIndexSet indexSetWithIndex:i] : [NSIndexSet new];
+}
+
+-(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self reloadAll];  // refresh values after returning from a picker
+}
+
+#pragma mark Status
+
+-(void)pickStatus {
+    NSArray<NSString*>* items = @[@"Любой",
+        [ReleasesPageableDataProvider getStatusNameFor:anixart::Release::Status::Ongoing],
+        [ReleasesPageableDataProvider getStatusNameFor:anixart::Release::Status::Upcoming],
+        [ReleasesPageableDataProvider getStatusNameFor:anixart::Release::Status::Finished]];
+    NSInteger current = 0;
+    if (_filter_request.status) {
+        switch (*_filter_request.status) {
+            case anixart::Release::Status::Ongoing:  current = 1; break;
+            case anixart::Release::Status::Upcoming: current = 2; break;
+            case anixart::Release::Status::Finished: current = 3; break;
+            default: break;
+        }
+    }
+    [self pushPickerWithTitle:@"Статус" items:items selected:[self singleIndexSet:current] multi:NO onPick:^(NSIndexSet* sel) {
+        NSInteger i = sel.firstIndex;
+        switch (i) {
+            case 0: self->_filter_request.status = std::nullopt; break;
+            case 1: self->_filter_request.status = anixart::Release::Status::Ongoing; break;
+            case 2: self->_filter_request.status = anixart::Release::Status::Upcoming; break;
+            case 3: self->_filter_request.status = anixart::Release::Status::Finished; break;
+        }
     }];
-    for (size_t i = 0; i < [studios count]; ++i) {
-        actions[1 + i] = [SingleSelectMenuAction actionWithTitle:studios[i] handler:^{
-            [self onStudioMenuItemSelectedAtIndex:1 + i];
-        }];
-    }
-    return actions;
 }
 
--(void)tryLoadEpisodeTypes {
+#pragma mark Category
+
+-(void)pickCategory {
+    NSArray<NSString*>* items = @[@"Любая",
+        [ReleasesPageableDataProvider getCategoryNameFor:anixart::Release::Category::Series],
+        [ReleasesPageableDataProvider getCategoryNameFor:anixart::Release::Category::Movies],
+        [ReleasesPageableDataProvider getCategoryNameFor:anixart::Release::Category::Ova]];
+    NSInteger current = 0;
+    if (_filter_request.category) {
+        switch (*_filter_request.category) {
+            case anixart::Release::Category::Series: current = 1; break;
+            case anixart::Release::Category::Movies: current = 2; break;
+            case anixart::Release::Category::Ova:    current = 3; break;
+            default: break;
+        }
+    }
+    [self pushPickerWithTitle:@"Категория" items:items selected:[self singleIndexSet:current] multi:NO onPick:^(NSIndexSet* sel) {
+        NSInteger i = sel.firstIndex;
+        switch (i) {
+            case 0: self->_filter_request.category = std::nullopt; break;
+            case 1: self->_filter_request.category = anixart::Release::Category::Series; break;
+            case 2: self->_filter_request.category = anixart::Release::Category::Movies; break;
+            case 3: self->_filter_request.category = anixart::Release::Category::Ova; break;
+        }
+    }];
+}
+
+#pragma mark Season
+
+-(void)pickSeason {
+    NSArray<NSString*>* items = @[@"Любой",
+        [ReleasesPageableDataProvider getSeasonNameFor:anixart::Release::Season::Winter],
+        [ReleasesPageableDataProvider getSeasonNameFor:anixart::Release::Season::Spring],
+        [ReleasesPageableDataProvider getSeasonNameFor:anixart::Release::Season::Summer],
+        [ReleasesPageableDataProvider getSeasonNameFor:anixart::Release::Season::Fall]];
+    NSInteger current = 0;
+    if (_filter_request.season) {
+        switch (*_filter_request.season) {
+            case anixart::Release::Season::Winter: current = 1; break;
+            case anixart::Release::Season::Spring: current = 2; break;
+            case anixart::Release::Season::Summer: current = 3; break;
+            case anixart::Release::Season::Fall:   current = 4; break;
+            default: break;
+        }
+    }
+    [self pushPickerWithTitle:@"Сезон" items:items selected:[self singleIndexSet:current] multi:NO onPick:^(NSIndexSet* sel) {
+        NSInteger i = sel.firstIndex;
+        switch (i) {
+            case 0: self->_filter_request.season = std::nullopt; break;
+            case 1: self->_filter_request.season = anixart::Release::Season::Winter; break;
+            case 2: self->_filter_request.season = anixart::Release::Season::Spring; break;
+            case 3: self->_filter_request.season = anixart::Release::Season::Summer; break;
+            case 4: self->_filter_request.season = anixart::Release::Season::Fall;   break;
+        }
+    }];
+}
+
+#pragma mark Country
+
+-(void)pickCountry {
+    NSArray<NSString*>* items = @[@"Любая", @"Япония", @"Китай"];
+    NSInteger current = 0;
+    if (_filter_request.country) {
+        NSString* cs = TO_NSSTRING(*_filter_request.country);
+        if ([cs isEqualToString:@"Япония"]) current = 1;
+        else if ([cs isEqualToString:@"Китай"]) current = 2;
+    }
+    [self pushPickerWithTitle:@"Страна" items:items selected:[self singleIndexSet:current] multi:NO onPick:^(NSIndexSet* sel) {
+        NSInteger i = sel.firstIndex;
+        switch (i) {
+            case 0: self->_filter_request.country = std::nullopt; break;
+            case 1: self->_filter_request.country = std::string("Япония"); break;
+            case 2: self->_filter_request.country = std::string("Китай"); break;
+        }
+    }];
+}
+
+#pragma mark Studio
+
+-(void)pickStudio {
+    NSArray<NSString*>* studios = [_api_proxy getStudiosArray] ?: @[];
+    NSMutableArray* items = [NSMutableArray arrayWithObject:@"Любая"];
+    [items addObjectsFromArray:studios];
+    NSInteger current = 0;
+    if (_filter_request.studio) {
+        NSString* s = TO_NSSTRING(*_filter_request.studio);
+        NSUInteger idx = [studios indexOfObject:s];
+        if (idx != NSNotFound) current = (NSInteger)(idx + 1);
+    }
+    [self pushPickerWithTitle:@"Студия" items:items selected:[self singleIndexSet:current] multi:NO onPick:^(NSIndexSet* sel) {
+        NSInteger i = sel.firstIndex;
+        if (i == 0) { self->_filter_request.studio = std::nullopt; return; }
+        self->_filter_request.studio = TO_STDSTRING(studios[i - 1]);
+    }];
+}
+
+#pragma mark Episode count
+
+-(void)pickEpisodeCount {
+    NSArray<NSString*>* items = @[@"Любое", @"1–12", @"13–24", @"25–100", @"101+"];
+    NSInteger current = [self episodeCountIndex];
+    [self pushPickerWithTitle:@"Количество эпизодов" items:items selected:[self singleIndexSet:current] multi:NO onPick:^(NSIndexSet* sel) {
+        NSInteger i = sel.firstIndex;
+        switch (i) {
+            case 0: self->_filter_request.episodes_count_from = std::nullopt; self->_filter_request.episodes_count_to = std::nullopt; break;
+            case 1: self->_filter_request.episodes_count_from = std::nullopt; self->_filter_request.episodes_count_to = 12; break;
+            case 2: self->_filter_request.episodes_count_from = 13;           self->_filter_request.episodes_count_to = 24; break;
+            case 3: self->_filter_request.episodes_count_from = 25;           self->_filter_request.episodes_count_to = 100; break;
+            case 4: self->_filter_request.episodes_count_from = 101;          self->_filter_request.episodes_count_to = std::nullopt; break;
+        }
+    }];
+}
+
+-(NSInteger)episodeCountIndex {
+    auto f = _filter_request.episodes_count_from, t = _filter_request.episodes_count_to;
+    if (!f && !t) return 0;
+    if (!f && t == 12) return 1;
+    if (f == 13 && t == 24) return 2;
+    if (f == 25 && t == 100) return 3;
+    if (f == 101 && !t) return 4;
+    return 0;
+}
+
+-(NSString*)episodeCountLabel {
+    NSArray<NSString*>* names = @[@"Любое", @"1–12", @"13–24", @"25–100", @"101+"];
+    return names[[self episodeCountIndex]];
+}
+
+#pragma mark Episode duration
+
+-(void)pickEpisodeDuration {
+    NSArray<NSString*>* items = @[@"Любая", @"до 10 мин", @"до 30 мин", @"30 мин и более"];
+    NSInteger current = [self episodeDurationIndex];
+    [self pushPickerWithTitle:@"Длительность эпизода" items:items selected:[self singleIndexSet:current] multi:NO onPick:^(NSIndexSet* sel) {
+        NSInteger i = sel.firstIndex;
+        switch (i) {
+            case 0: self->_filter_request.episode_duration_from = std::nullopt; self->_filter_request.episode_duration_to = std::nullopt; break;
+            case 1: self->_filter_request.episode_duration_from = std::nullopt; self->_filter_request.episode_duration_to = std::chrono::minutes(10); break;
+            case 2: self->_filter_request.episode_duration_from = std::nullopt; self->_filter_request.episode_duration_to = std::chrono::minutes(30); break;
+            case 3: self->_filter_request.episode_duration_from = std::chrono::minutes(30); self->_filter_request.episode_duration_to = std::nullopt; break;
+        }
+    }];
+}
+
+-(NSInteger)episodeDurationIndex {
+    auto f = _filter_request.episode_duration_from, t = _filter_request.episode_duration_to;
+    if (!f && !t) return 0;
+    if (!f && t == std::chrono::minutes(10)) return 1;
+    if (!f && t == std::chrono::minutes(30)) return 2;
+    if (f == std::chrono::minutes(30) && !t) return 3;
+    return 0;
+}
+
+-(NSString*)episodeDurationLabel {
+    NSArray<NSString*>* names = @[@"Любая", @"до 10 мин", @"до 30 мин", @"30 мин и более"];
+    return names[[self episodeDurationIndex]];
+}
+
+#pragma mark Genres
+
+-(void)pickGenres {
+    NSArray<NSString*>* genres = [_api_proxy getGenresArray] ?: @[];
+    NSMutableIndexSet* selected = [NSMutableIndexSet new];
+    for (const auto& g : _filter_request.genres) {
+        NSString* gs = TO_NSSTRING(g);
+        NSUInteger idx = [genres indexOfObject:gs];
+        if (idx != NSNotFound) [selected addIndex:idx];
+    }
+    [self pushPickerWithTitle:@"Жанры" items:genres selected:selected multi:YES onPick:^(NSIndexSet* sel) {
+        self->_filter_request.genres.clear();
+        [sel enumerateIndexesUsingBlock:^(NSUInteger i, BOOL* _) {
+            self->_filter_request.genres.push_back(TO_STDSTRING(genres[i]));
+        }];
+    }];
+}
+
+#pragma mark Types
+
+-(void)pickTypes {
+    NSMutableArray<NSString*>* items = [NSMutableArray array];
+    std::vector<anixart::EpisodeTypeID> ids;
+    for (const auto& t : _episode_types) { [items addObject:TO_NSSTRING(t->name)]; ids.push_back(t->id); }
+
+    NSMutableIndexSet* selected = [NSMutableIndexSet new];
+    for (const auto& tid : _filter_request.types) {
+        for (size_t i = 0; i < ids.size(); ++i) if (ids[i] == tid) { [selected addIndex:i]; break; }
+    }
+    [self pushPickerWithTitle:@"Типы эпизодов" items:items selected:selected multi:YES onPick:^(NSIndexSet* sel) {
+        self->_filter_request.types.clear();
+        [sel enumerateIndexesUsingBlock:^(NSUInteger i, BOOL* _) {
+            self->_filter_request.types.push_back(ids[i]);
+        }];
+    }];
+}
+
+#pragma mark Age ratings
+
+-(void)pickAgeRatings {
+    using AR = anixart::Release::AgeRating;
+    std::vector<AR> all = { AR::G, AR::PG6, AR::PG12, AR::R16, AR::R18 };
+    NSMutableArray<NSString*>* items = [NSMutableArray array];
+    for (auto a : all) [items addObject:[ReleasesPageableDataProvider getAgeRatingNameFor:a]];
+
+    NSMutableIndexSet* selected = [NSMutableIndexSet new];
+    for (auto a : _filter_request.age_ratings) {
+        for (size_t i = 0; i < all.size(); ++i) if (all[i] == a) { [selected addIndex:i]; break; }
+    }
+    [self pushPickerWithTitle:@"Возрастной рейтинг" items:items selected:selected multi:YES onPick:^(NSIndexSet* sel) {
+        self->_filter_request.age_ratings.clear();
+        [sel enumerateIndexesUsingBlock:^(NSUInteger i, BOOL* _) {
+            self->_filter_request.age_ratings.push_back(all[i]);
+        }];
+    }];
+}
+
+#pragma mark Profile list exclusions
+
+-(void)pickProfileListExclusions {
+    using L = anixart::Profile::List;
+    std::vector<L> all = { L::Favorite, L::Watching, L::Plan, L::Watched, L::HoldOn, L::Dropped };
+    NSMutableArray<NSString*>* items = [NSMutableArray array];
+    for (auto l : all) [items addObject:[ProfileListsView getListName:l]];
+
+    NSMutableIndexSet* selected = [NSMutableIndexSet new];
+    for (auto l : _filter_request.profile_list_exclusions) {
+        for (size_t i = 0; i < all.size(); ++i) if (all[i] == l) { [selected addIndex:i]; break; }
+    }
+    [self pushPickerWithTitle:@"Исключить списки" items:items selected:selected multi:YES onPick:^(NSIndexSet* sel) {
+        self->_filter_request.profile_list_exclusions.clear();
+        [sel enumerateIndexesUsingBlock:^(NSUInteger i, BOOL* _) {
+            self->_filter_request.profile_list_exclusions.push_back(all[i]);
+        }];
+    }];
+}
+
+#pragma mark Sort
+
+-(void)pickSort {
+    using Sort = anixart::requests::FilterRequest::Sort;
+    NSArray<NSString*>* items = @[@"По обновлению", @"По рейтингу", @"По году", @"По популярности"];
+    Sort current = _filter_request.sort.value_or(Sort::DateUpdate);
+    NSInteger idx = 0;
+    switch (current) {
+        case Sort::DateUpdate: idx = 0; break;
+        case Sort::Grade:      idx = 1; break;
+        case Sort::Year:       idx = 2; break;
+        case Sort::Popular:    idx = 3; break;
+    }
+    [self pushPickerWithTitle:@"Сортировка" items:items selected:[self singleIndexSet:idx] multi:NO onPick:^(NSIndexSet* sel) {
+        switch (sel.firstIndex) {
+            case 0: self->_filter_request.sort = Sort::DateUpdate; break;
+            case 1: self->_filter_request.sort = Sort::Grade;      break;
+            case 2: self->_filter_request.sort = Sort::Year;       break;
+            case 3: self->_filter_request.sort = Sort::Popular;    break;
+        }
+    }];
+}
+
+-(NSString*)sortLabel {
+    using Sort = anixart::requests::FilterRequest::Sort;
+    switch (_filter_request.sort.value_or(Sort::DateUpdate)) {
+        case Sort::DateUpdate: return @"По обновлению";
+        case Sort::Grade:      return @"По рейтингу";
+        case Sort::Year:       return @"По году";
+        case Sort::Popular:    return @"По популярности";
+    }
+    return @"По обновлению";
+}
+
+#pragma mark - Actions
+
+-(void)onResetTapped {
+    _filter_request = anixart::requests::FilterRequest{};
+    [self reloadAll];
+}
+
+-(void)onApplyTapped {
+    anixart::FilterPages::UPtr pages = _api_proxy.api->search().filter_search(_filter_request, false, 0);
+    ReleasesViewController* vc = [[ReleasesViewController alloc] initWithPages:std::move(pages)];
+    vc.title = @"Результаты";
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+#pragma mark - Async data
+
+-(void)loadEpisodeTypes {
     [_api_proxy performAsyncBlock:^BOOL(anixart::Api* api){
         self->_episode_types = api->episodes().get_all_types();
         return YES;
     } withUICompletion:^{
-        [self updateTypesButtonActions];
+        // No-op visible change; picker reads `_episode_types` directly on push.
     }];
-}
-
--(void)updateTypesButtonActions {
-    NSMutableArray<MultiSelectMenuAction*>* actions = [NSMutableArray arrayWithCapacity:_episode_types.size()];
-    for (size_t i = 0; i < _episode_types.size(); ++i) {
-        actions[i] = [MultiSelectMenuAction actionWithTitle:TO_NSSTRING(_episode_types[i]->name) handler:^(BOOL selected) {
-            [self onTypeMenuItemSelectedAtIndex:i selected:selected];
-        }];
-    }
-    [_types_select_button updateActions:actions];
-}
-
--(void)updateGenresExcludeButton {
-    if (_filter_request.is_genres_exclude_mode) {
-        _genres_exclude_mode_button.tintColor = [AppColorProvider primaryColor];
-    } else {
-        _genres_exclude_mode_button.tintColor = [UIColor systemGrayColor];
-    }
-}
-
--(void)presentMultiSelectViewController:(UIViewController*)view_controller {
-    [self presentViewController:view_controller animated:YES completion:nil];
-}
-
--(void)onStatusMenuItemSelected:(anixart::Release::Status)status {
-    if (status == anixart::Release::Status::Unknown) {
-        _filter_request.status = std::nullopt;
-        return;
-    }
-    _filter_request.status = status;
-}
--(void)onCategoryMenuItemSelected:(anixart::Release::Category)category {
-    if (category == anixart::Release::Category::Unknown) {
-        _filter_request.category = std::nullopt;
-        return;
-    }
-    _filter_request.category = category;
-}
--(void)onCountryMenuItemSelected:(NSString*)country {
-    if (country == nil) {
-        _filter_request.country = std::nullopt;
-        return;
-    }
-    _filter_request.country = TO_STDSTRING(country);
-}
--(void)onStudioMenuItemSelectedAtIndex:(size_t)index {
-    if (index == 0) {
-        _filter_request.studio = std::nullopt;
-        return;
-    }
-    NSArray<NSString*>* studios = [_api_proxy getStudiosArray];
-    _filter_request.studio = TO_STDSTRING(studios[index - 1]);
-}
--(void)onSeasonMenuItemSelected:(anixart::Release::Season)season {
-    if (season == anixart::Release::Season::Unknown) {
-        _filter_request.season = std::nullopt;
-        return;
-    }
-    _filter_request.season = season;
-}
--(void)onEpisodeCountMenuItemSelected:(NSInteger)count_index {
-    if (count_index == 0) {
-        _filter_request.episodes_count_from = std::nullopt;
-        _filter_request.episodes_count_to = std::nullopt;
-        return;
-    }
-    switch (count_index) {
-        case 1:
-            _filter_request.episodes_count_from = std::nullopt;
-            _filter_request.episodes_count_to = 12;
-            break;
-        case 2:
-            _filter_request.episodes_count_from = 13;
-            _filter_request.episodes_count_to = 24;
-            break;
-        case 3:
-            _filter_request.episodes_count_from = 25;
-            _filter_request.episodes_count_to = 100;
-            break;
-        case 4:
-            _filter_request.episodes_count_from = 101;
-            _filter_request.episodes_count_to = std::nullopt;
-            break;
-    }
-}
--(void)onEpisodeDurationMenuItemSelected:(NSInteger)duration_index {
-    if (duration_index == 0) {
-        _filter_request.episode_duration_from = std::nullopt;
-        _filter_request.episode_duration_to = std::nullopt;
-        return;
-    }
-    switch (duration_index) {
-        case 1:
-            _filter_request.episode_duration_from = std::nullopt;
-            _filter_request.episode_duration_to = std::chrono::minutes(10);
-            break;
-        case 2:
-            _filter_request.episode_duration_from = std::nullopt;
-            _filter_request.episode_duration_to = std::chrono::minutes(30);
-            break;
-        case 3:
-            _filter_request.episode_duration_from = std::chrono::minutes(30);
-            _filter_request.episode_duration_to = std::nullopt;
-            break;
-    }
-}
-
--(void)onSortSelectMenuItemSelected:(anixart::requests::FilterRequest::Sort)sort {
-    _filter_request.sort = sort;
-}
-
--(void)onGenresMenuItemSelectedAtIndex:(size_t)index selected:(BOOL)selected {
-    NSArray<NSString*>* genres = [_api_proxy getGenresArray];
-    std::string selected_genre = TO_STDSTRING(genres[index]);
-    if (selected) {
-        _filter_request.genres.push_back(selected_genre);
-        return;
-    }
-    std::erase_if(_filter_request.genres, [&selected_genre](const std::string& genre) {
-        return genre == selected_genre;
-    });
-}
-
--(void)onTypeMenuItemSelectedAtIndex:(size_t)index selected:(BOOL)selected {
-    anixart::EpisodeTypeID selected_episode_type_id = _episode_types[index]->id;
-    if (selected) {
-        _filter_request.types.push_back(selected_episode_type_id);
-        return;
-    }
-    std::erase_if(_filter_request.types, [&selected_episode_type_id](const anixart::EpisodeTypeID& episode_type_id) {
-        return episode_type_id == selected_episode_type_id;
-    });
-}
-
--(void)onProfileListExlusionMenuItemSelected:(anixart::Profile::List)profile_list selected:(BOOL)selected {
-    if (selected) {
-        _filter_request.profile_list_exclusions.push_back(profile_list);
-        return;
-    }
-    std::erase_if(_filter_request.profile_list_exclusions, [&profile_list](const anixart::Profile::List& list) {
-        return list == profile_list;
-    });
-}
-
-
--(void)onAgeRatingMenuItemSelected:(anixart::Release::AgeRating)age_rating selected:(BOOL)selected {
-    if (selected) {
-        _filter_request.age_ratings.push_back(age_rating);
-        return;
-    }
-    std::erase_if(_filter_request.age_ratings, [&age_rating](const anixart::Release::AgeRating& rating) {
-        return rating == age_rating;
-    });
-}
-
--(IBAction)onGenresExcludeModePressed:(UIButton*)sender {
-    _filter_request.is_genres_exclude_mode = !_filter_request.is_genres_exclude_mode;
-    [self updateGenresExcludeButton];
-}
-
--(IBAction)onSearchButtonPressed:(UIButton*)sender {
-    anixart::FilterPages::UPtr pages = _api_proxy.api->search().filter_search(_filter_request, false, 0);
-    
-    ReleasesViewController* releases_view_controller = [[ReleasesViewController alloc] initWithPages:std::move(pages)];
-    [self.navigationController pushViewController:releases_view_controller animated:YES];
 }
 
 @end
