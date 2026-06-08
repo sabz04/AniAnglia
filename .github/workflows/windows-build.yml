@@ -66,6 +66,12 @@ jobs:
           # compiler error swallows the real message we attach the binlog
           # as an artifact for offline inspection in MSBuild Structured
           # Log Viewer.
+          #
+          # UseXamlCompilerExecutable=false forces MarkupCompilePass2
+          # through the in-process Microsoft.UI.Xaml.Markup.Compiler.dll
+          # task. Microsoft.UI.Xaml.Markup.Compiler.props ships an
+          # override-without-Condition that pins this to "true" — passing
+          # it as a CLI property here beats the targets-level setter.
           dotnet publish src/AniAngliaWin/AniAngliaWin.csproj `
             -c $env:CONFIGURATION `
             -r $env:RUNTIME `
@@ -75,6 +81,7 @@ jobs:
             -p:PublishReadyToRun=false `
             -p:WindowsPackageType=None `
             -p:UseAppHost=true `
+            -p:UseXamlCompilerExecutable=false `
             -v:detailed `
             -bl:msbuild.binlog `
             --output publish
