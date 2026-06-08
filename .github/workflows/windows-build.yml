@@ -62,6 +62,10 @@ jobs:
 
       - name: Publish self-contained EXE
         run: |
+          # -bl writes a MSBuild binary log next to the project; if a XAML
+          # compiler error swallows the real message we attach the binlog
+          # as an artifact for offline inspection in MSBuild Structured
+          # Log Viewer.
           dotnet publish src/AniAngliaWin/AniAngliaWin.csproj `
             -c $env:CONFIGURATION `
             -r $env:RUNTIME `
@@ -71,7 +75,18 @@ jobs:
             -p:PublishReadyToRun=false `
             -p:WindowsPackageType=None `
             -p:UseAppHost=true `
+            -v:detailed `
+            -bl:msbuild.binlog `
             --output publish
+
+      - name: Upload MSBuild binlog (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: msbuild-binlog-${{ env.RUNTIME }}-${{ env.CONFIGURATION }}
+          path: windows/msbuild.binlog
+          if-no-files-found: warn
+          retention-days: 7
 
       - name: Show output
         run: |

@@ -18,8 +18,8 @@
     <PackageVersion Include="CommunityToolkit.WinUI.Lottie" Version="8.0.240109" />
     <PackageVersion Include="CommunityToolkit.WinUI.Media" Version="8.0.240109" />
 
-    <!-- JSON for persisted state -->
-    <PackageVersion Include="System.Text.Json" Version="8.0.4" />
+    <!-- JSON for persisted state. 8.0.5 patches GHSA-8g4q-xg66-9fp4. -->
+    <PackageVersion Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
 
 </Project>

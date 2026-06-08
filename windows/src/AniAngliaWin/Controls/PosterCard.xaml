@@ -13,14 +13,13 @@
             <RowDefinition Height="Auto"/> <!-- meta -->
         </Grid.RowDefinitions>
 
-        <!-- 2:3 poster — 160×240. Shadow + soft border. -->
+        <!-- 2:3 poster — 160×240. Soft pink border, corner radius clips
+             the YukimoAsyncImage inside via the Border itself. -->
         <Grid Grid.Row="0"
-              Width="160" Height="240"
-              CornerRadius="{ThemeResource YukimoRadiusMd}">
+              Width="160" Height="240">
             <Border CornerRadius="{ThemeResource YukimoRadiusMd}"
                     BorderBrush="{ThemeResource YukimoBorderSoftBrush}"
-                    BorderThickness="0.5"
-                    ClipMode="Always">
+                    BorderThickness="0.5">
                 <local:YukimoAsyncImage x:Name="Poster"
                                         Stretch="UniformToFill"/>
             </Border>

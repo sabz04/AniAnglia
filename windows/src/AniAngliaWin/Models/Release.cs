@@ -7,22 +7,22 @@ namespace AniAngliaWin.Models;
 /// </summary>
 public sealed class Release
 {
-    public required long ReleaseId { get; init; }
-    public required string TitleRu { get; init; }
-    public string? TitleOriginal { get; init; }
-    public string? ImageUrl { get; init; }
-    public string? Genres { get; init; }
-    public string? Year { get; init; }
-    public double Grade { get; init; }
-    public int VoteCount { get; init; }
-    public ReleaseStatus Status { get; init; }
-    public int EpisodesReleased { get; init; }
-    public int EpisodesTotal { get; init; }
+    public long ReleaseId { get; set; }
+    public string TitleRu { get; set; } = "";
+    public string? TitleOriginal { get; set; }
+    public string? ImageUrl { get; set; }
+    public string? Genres { get; set; }
+    public string? Year { get; set; }
+    public double Grade { get; set; }
+    public int VoteCount { get; set; }
+    public ReleaseStatus Status { get; set; }
+    public int EpisodesReleased { get; set; }
+    public int EpisodesTotal { get; set; }
 
-    public int? LastViewEpisodePosition { get; init; }
-    public string? LastViewEpisodeName { get; init; }
+    public int? LastViewEpisodePosition { get; set; }
+    public string? LastViewEpisodeName { get; set; }
     /// <summary>0..1, only meaningful for Continue Watching.</summary>
-    public double LastViewProgress { get; init; }
+    public double LastViewProgress { get; set; }
 
     /// <summary>Best display title — RU first, otherwise the original.</summary>
     public string DisplayTitle => string.IsNullOrEmpty(TitleRu) ? (TitleOriginal ?? "") : TitleRu;

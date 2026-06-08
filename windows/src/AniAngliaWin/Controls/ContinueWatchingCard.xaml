@@ -24,8 +24,7 @@
             <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
                     Width="88" Height="132"
                     VerticalAlignment="Top"
-                    CornerRadius="{ThemeResource YukimoRadiusSm}"
-                    ClipMode="Always">
+                    CornerRadius="{ThemeResource YukimoRadiusSm}">
                 <local:YukimoAsyncImage x:Name="Poster"
                                         Stretch="UniformToFill"/>
             </Border>

@@ -8,8 +8,7 @@
 
     <Border CornerRadius="{ThemeResource YukimoRadiusXl}"
             BorderBrush="{ThemeResource YukimoBorderSoftBrush}"
-            BorderThickness="0.5"
-            ClipMode="Always">
+            BorderThickness="0.5">
         <Grid>
             <!-- Full-bleed hero artwork -->
             <local:YukimoAsyncImage x:Name="HeroImage"

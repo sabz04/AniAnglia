@@ -9,9 +9,9 @@ namespace AniAngliaWin.Models;
 /// </summary>
 public sealed class HomeData
 {
-    public required Release? Hero { get; init; }
-    public required IReadOnlyList<Release> ContinueWatching { get; init; }
-    public required IReadOnlyList<Release> Recommendations { get; init; }
-    public required IReadOnlyList<Release> CurrentlyWatching { get; init; }
-    public required IReadOnlyList<Release> Discussing { get; init; }
+    public Release? Hero { get; set; }
+    public IReadOnlyList<Release> ContinueWatching { get; set; } = System.Array.Empty<Release>();
+    public IReadOnlyList<Release> Recommendations { get; set; } = System.Array.Empty<Release>();
+    public IReadOnlyList<Release> CurrentlyWatching { get; set; } = System.Array.Empty<Release>();
+    public IReadOnlyList<Release> Discussing { get; set; } = System.Array.Empty<Release>();
 }

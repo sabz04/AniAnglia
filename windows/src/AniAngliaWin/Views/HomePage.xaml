@@ -48,8 +48,7 @@
                         Height="320"
                         CornerRadius="{ThemeResource YukimoRadiusXl}"
                         BorderBrush="{ThemeResource YukimoBorderSoftBrush}"
-                        BorderThickness="0.5"
-                        ClipMode="Always">
+                        BorderThickness="0.5">
                     <controls:Shimmer/>
                 </Border>
                 <!-- Real hero -->
