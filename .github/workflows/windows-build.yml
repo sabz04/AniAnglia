@@ -1,0 +1,89 @@
+name: windows-build
+
+# Builds the WinUI 3 / .NET 8 client (unpackaged, self-contained, x64).
+# Run from the GitHub UI ("Actions" tab → "windows-build" → "Run workflow")
+# or push to feature/windows-app. The result is a zip of the Release output
+# attached to the run as a downloadable artifact.
+
+on:
+  workflow_dispatch:
+    inputs:
+      configuration:
+        description: 'Build configuration'
+        required: true
+        default: 'Release'
+        type: choice
+        options:
+          - Release
+          - Debug
+      runtime:
+        description: 'Target runtime'
+        required: true
+        default: 'win-x64'
+        type: choice
+        options:
+          - win-x64
+          - win-arm64
+  push:
+    branches:
+      - feature/windows-app
+    paths:
+      - 'windows/**'
+      - '.github/workflows/windows-build.yml'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: windows
+    env:
+      CONFIGURATION: ${{ github.event.inputs.configuration || 'Release' }}
+      RUNTIME: ${{ github.event.inputs.runtime || 'win-x64' }}
+      DOTNET_NOLOGO: 'true'
+      DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          # global.json inside `windows/` pins the version; setup-dotnet
+          # only needs to make a recent 8.x SDK available on PATH.
+          dotnet-version: '8.0.x'
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore NuGet packages
+        run: dotnet restore AniAngliaWin.sln
+
+      - name: Publish self-contained EXE
+        run: |
+          dotnet publish src/AniAngliaWin/AniAngliaWin.csproj `
+            -c $env:CONFIGURATION `
+            -r $env:RUNTIME `
+            -p:Platform=$($env:RUNTIME -eq 'win-arm64' ? 'arm64' : 'x64') `
+            -p:WindowsAppSDKSelfContained=true `
+            -p:SelfContained=true `
+            -p:PublishReadyToRun=false `
+            -p:WindowsPackageType=None `
+            -p:UseAppHost=true `
+            --output publish
+
+      - name: Show output
+        run: |
+          Get-ChildItem -Path publish -Recurse | Select-Object FullName, Length | Format-Table
+          if (Test-Path "publish/AniAngliaWin.exe") {
+            Write-Host "::notice::AniAngliaWin.exe = $((Get-Item publish/AniAngliaWin.exe).Length / 1MB) MB"
+          }
+
+      - name: Upload exe + runtime
+        uses: actions/upload-artifact@v4
+        with:
+          name: AniAngliaWin-${{ env.RUNTIME }}-${{ env.CONFIGURATION }}
+          path: windows/publish/**
+          if-no-files-found: error
+          retention-days: 14
