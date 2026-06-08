@@ -1,0 +1,27 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build outputs
+bin/
+obj/
+AppPackages/
+BundleArtifacts/
+publish/
+TestResults/
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+
+# WinUI / WindowsAppSDK generated
+Generated Files/
+**/Generated Files/
+**/winmd/
+
+# vcpkg (Phase 1)
+vcpkg_installed/

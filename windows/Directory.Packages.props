@@ -1,0 +1,25 @@
+<Project>
+
+  <ItemGroup>
+    <!-- Platform / WinUI -->
+    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.5.240607001" />
+    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.3233" />
+
+    <!-- MVVM / DI -->
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+
+    <!-- Helpful WinUI extensions -->
+    <PackageVersion Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.0.240109" />
+    <PackageVersion Include="CommunityToolkit.WinUI.Behaviors" Version="8.0.240109" />
+    <PackageVersion Include="CommunityToolkit.WinUI.Lottie" Version="8.0.240109" />
+    <PackageVersion Include="CommunityToolkit.WinUI.Media" Version="8.0.240109" />
+
+    <!-- JSON for persisted state -->
+    <PackageVersion Include="System.Text.Json" Version="8.0.4" />
+  </ItemGroup>
+
+</Project>

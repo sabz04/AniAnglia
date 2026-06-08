@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="AniAngliaWin.Views.LibraryPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:AniAngliaWin.Controls"
+    Background="Transparent">
+
+    <controls:PlaceholderPanel
+        Title="{x:Bind ViewModel.Headline, Mode=OneWay}"
+        Subtitle="{x:Bind ViewModel.Sub, Mode=OneWay}"
+        Glyph="&#xE8A4;"/>
+</Page>

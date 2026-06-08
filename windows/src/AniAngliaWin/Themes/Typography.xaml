@@ -1,0 +1,102 @@
+<!--
+    Typography.xaml
+    Mirrors YukimoTypography.swift. Segoe UI Variable is Win11's native
+    variable font; falls back to "Segoe UI" on Win10. Both render with
+    nice metrics so the size scale ports 1:1 from iOS.
+
+    Use the *Style keys in XAML:  Style="{StaticResource YukimoTitle}"
+-->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <x:String x:Key="YukimoFontFamily">Segoe UI Variable Text, Segoe UI</x:String>
+    <x:String x:Key="YukimoFontFamilyDisplay">Segoe UI Variable Display, Segoe UI</x:String>
+    <x:String x:Key="YukimoFontFamilyMono">Cascadia Mono, Consolas</x:String>
+
+    <Style x:Key="YukimoDisplay" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource YukimoFontFamilyDisplay}" />
+        <Setter Property="FontSize"   Value="36" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{ThemeResource YukimoTextPrimaryBrush}" />
+    </Style>
+
+    <Style x:Key="YukimoLargeTitle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource YukimoFontFamilyDisplay}" />
+        <Setter Property="FontSize"   Value="30" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{ThemeResource YukimoTextPrimaryBrush}" />
+    </Style>
+
+    <Style x:Key="YukimoTitle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource YukimoFontFamilyDisplay}" />
+        <Setter Property="FontSize"   Value="26" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{ThemeResource YukimoTextPrimaryBrush}" />
+    </Style>
+
+    <Style x:Key="YukimoTitle2" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource YukimoFontFamily}" />
+        <Setter Property="FontSize"   Value="22" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{ThemeResource YukimoTextPrimaryBrush}" />
+    </Style>
+
+    <Style x:Key="YukimoTitle3" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource YukimoFontFamily}" />
+        <Setter Property="FontSize"   Value="20" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{ThemeResource YukimoTextPrimaryBrush}" />
+    </Style>
+
+    <Style x:Key="YukimoHeadline" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource YukimoFontFamily}" />
+        <Setter Property="FontSize"   Value="17" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{ThemeResource YukimoTextPrimaryBrush}" />
+    </Style>
+
+    <Style x:Key="YukimoBody" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource YukimoFontFamily}" />
+        <Setter Property="FontSize"   Value="16" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="Foreground" Value="{ThemeResource YukimoTextPrimaryBrush}" />
+    </Style>
+
+    <Style x:Key="YukimoBodyEmphasized" TargetType="TextBlock" BasedOn="{StaticResource YukimoBody}">
+        <Setter Property="FontWeight" Value="Medium" />
+    </Style>
+
+    <Style x:Key="YukimoCallout" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource YukimoFontFamily}" />
+        <Setter Property="FontSize"   Value="15" />
+        <Setter Property="Foreground" Value="{ThemeResource YukimoTextPrimaryBrush}" />
+    </Style>
+
+    <Style x:Key="YukimoSubhead" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource YukimoFontFamily}" />
+        <Setter Property="FontSize"   Value="14" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Foreground" Value="{ThemeResource YukimoTextSecondaryBrush}" />
+    </Style>
+
+    <Style x:Key="YukimoFootnote" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource YukimoFontFamily}" />
+        <Setter Property="FontSize"   Value="13" />
+        <Setter Property="Foreground" Value="{ThemeResource YukimoTextSecondaryBrush}" />
+    </Style>
+
+    <Style x:Key="YukimoCaption" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource YukimoFontFamily}" />
+        <Setter Property="FontSize"   Value="12" />
+        <Setter Property="Foreground" Value="{ThemeResource YukimoTextTertiaryBrush}" />
+    </Style>
+
+    <Style x:Key="YukimoSmall" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource YukimoFontFamily}" />
+        <Setter Property="FontSize"   Value="11" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Foreground" Value="{ThemeResource YukimoTextTertiaryBrush}" />
+    </Style>
+
+</ResourceDictionary>

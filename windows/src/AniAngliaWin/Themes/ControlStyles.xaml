@@ -1,0 +1,89 @@
+<!--
+    ControlStyles.xaml
+    Yukimo-flavoured restyling of the most common WinUI controls so the
+    app inherits the coral/soft-pink language without per-page overrides.
+-->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ===== Primary call-to-action button ===== -->
+    <Style x:Key="YukimoPrimaryButton" TargetType="Button">
+        <Setter Property="Background"   Value="{ThemeResource YukimoPrimaryCoralBrush}" />
+        <Setter Property="Foreground"   Value="{ThemeResource YukimoTextOnPrimaryBrush}" />
+        <Setter Property="BorderBrush"  Value="Transparent" />
+        <Setter Property="CornerRadius" Value="{ThemeResource YukimoRadiusButton}" />
+        <Setter Property="Padding"      Value="20,12" />
+        <Setter Property="FontFamily"   Value="{StaticResource YukimoFontFamily}" />
+        <Setter Property="FontSize"     Value="17" />
+        <Setter Property="FontWeight"   Value="SemiBold" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="MinHeight"    Value="48" />
+        <Setter Property="UseSystemFocusVisuals" Value="True" />
+    </Style>
+
+    <!-- ===== Secondary (outlined) button ===== -->
+    <Style x:Key="YukimoSecondaryButton" TargetType="Button">
+        <Setter Property="Background"   Value="{ThemeResource YukimoSoftPinkBrush}" />
+        <Setter Property="Foreground"   Value="{ThemeResource YukimoPrimaryCoralBrush}" />
+        <Setter Property="BorderBrush"  Value="{ThemeResource YukimoBorderSoftBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{ThemeResource YukimoRadiusButton}" />
+        <Setter Property="Padding"      Value="20,12" />
+        <Setter Property="FontFamily"   Value="{StaticResource YukimoFontFamily}" />
+        <Setter Property="FontSize"     Value="17" />
+        <Setter Property="FontWeight"   Value="SemiBold" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="MinHeight"    Value="48" />
+    </Style>
+
+    <!-- ===== Ghost / text-only button ===== -->
+    <Style x:Key="YukimoGhostButton" TargetType="Button">
+        <Setter Property="Background"   Value="Transparent" />
+        <Setter Property="Foreground"   Value="{ThemeResource YukimoPrimaryCoralBrush}" />
+        <Setter Property="BorderBrush"  Value="Transparent" />
+        <Setter Property="CornerRadius" Value="{ThemeResource YukimoRadiusSm}" />
+        <Setter Property="Padding"      Value="8,4" />
+        <Setter Property="FontFamily"   Value="{StaticResource YukimoFontFamily}" />
+        <Setter Property="FontSize"     Value="14" />
+        <Setter Property="FontWeight"   Value="SemiBold" />
+    </Style>
+
+    <!-- ===== Surface card — used as panel background everywhere ===== -->
+    <Style x:Key="YukimoSurfaceCard" TargetType="Border">
+        <Setter Property="Background"     Value="{ThemeResource YukimoSurfaceBrush}" />
+        <Setter Property="BorderBrush"    Value="{ThemeResource YukimoBorderSoftBrush}" />
+        <Setter Property="BorderThickness" Value="0.5" />
+        <Setter Property="CornerRadius"   Value="{ThemeResource YukimoRadiusCard}" />
+        <Setter Property="Padding"        Value="16" />
+    </Style>
+
+    <!-- ===== TextBox (auth/search) ===== -->
+    <Style x:Key="YukimoTextBox" TargetType="TextBox">
+        <Setter Property="Background"      Value="{ThemeResource YukimoSurfaceBrush}" />
+        <Setter Property="Foreground"      Value="{ThemeResource YukimoTextPrimaryBrush}" />
+        <Setter Property="BorderBrush"     Value="{ThemeResource YukimoBorderSoftBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius"    Value="{ThemeResource YukimoRadiusField}" />
+        <Setter Property="Padding"         Value="14,12" />
+        <Setter Property="MinHeight"       Value="48" />
+        <Setter Property="FontFamily"      Value="{StaticResource YukimoFontFamily}" />
+        <Setter Property="FontSize"        Value="16" />
+        <Setter Property="PlaceholderForeground" Value="{ThemeResource YukimoTextTertiaryBrush}" />
+    </Style>
+
+    <Style x:Key="YukimoPasswordBox" TargetType="PasswordBox" BasedOn="{StaticResource DefaultPasswordBoxStyle}">
+        <Setter Property="Background"      Value="{ThemeResource YukimoSurfaceBrush}" />
+        <Setter Property="Foreground"      Value="{ThemeResource YukimoTextPrimaryBrush}" />
+        <Setter Property="BorderBrush"     Value="{ThemeResource YukimoBorderSoftBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius"    Value="{ThemeResource YukimoRadiusField}" />
+        <Setter Property="Padding"         Value="14,12" />
+        <Setter Property="MinHeight"       Value="48" />
+        <Setter Property="FontFamily"      Value="{StaticResource YukimoFontFamily}" />
+        <Setter Property="FontSize"        Value="16" />
+    </Style>
+
+</ResourceDictionary>
