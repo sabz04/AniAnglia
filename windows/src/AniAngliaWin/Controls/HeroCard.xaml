@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="AniAngliaWin.Controls.HeroCard"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:AniAngliaWin.Controls"
+    Height="320">
+
+    <Border CornerRadius="{ThemeResource YukimoRadiusXl}"
+            BorderBrush="{ThemeResource YukimoBorderSoftBrush}"
+            BorderThickness="0.5"
+            ClipMode="Always">
+        <Grid>
+            <!-- Full-bleed hero artwork -->
+            <local:YukimoAsyncImage x:Name="HeroImage"
+                                    Stretch="UniformToFill"/>
+
+            <!-- Bottom-up gradient scrim so the text is legible no matter what -->
+            <Rectangle>
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                        <GradientStop Color="#00000000" Offset="0.0"/>
+                        <GradientStop Color="#22000000" Offset="0.45"/>
+                        <GradientStop Color="#AA000000" Offset="0.85"/>
+                        <GradientStop Color="#CC000000" Offset="1.0"/>
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+
+            <!-- Identity block bottom-left -->
+            <StackPanel VerticalAlignment="Bottom"
+                        HorizontalAlignment="Left"
+                        Margin="28"
+                        Spacing="10"
+                        MaxWidth="640">
+                <Border x:Name="StatusPill"
+                        HorizontalAlignment="Left"
+                        Padding="10,4"
+                        CornerRadius="{ThemeResource YukimoRadiusPill}"
+                        Background="#33FFFFFF"
+                        BorderBrush="#55FFFFFF"
+                        BorderThickness="0.5"
+                        Visibility="Collapsed">
+                    <TextBlock x:Name="StatusText"
+                               Foreground="White"
+                               FontSize="11"
+                               FontWeight="Bold"/>
+                </Border>
+
+                <TextBlock x:Name="TitleText"
+                           FontFamily="{StaticResource YukimoFontFamilyDisplay}"
+                           FontSize="32"
+                           FontWeight="Bold"
+                           Foreground="White"
+                           MaxLines="2"
+                           TextWrapping="WrapWholeWords"
+                           TextTrimming="CharacterEllipsis"/>
+
+                <TextBlock x:Name="OriginalText"
+                           FontFamily="{StaticResource YukimoFontFamily}"
+                           FontSize="14"
+                           Foreground="#CCFFFFFF"
+                           MaxLines="1"
+                           TextTrimming="CharacterEllipsis"/>
+
+                <!-- Meta strip — rating · year · episodes -->
+                <StackPanel Orientation="Horizontal" Spacing="14">
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                        <FontIcon Glyph="&#xE735;"
+                                  FontSize="13"
+                                  Foreground="{ThemeResource YukimoWarningBrush}"/>
+                        <TextBlock x:Name="GradeText"
+                                   Foreground="White"
+                                   FontFamily="{StaticResource YukimoFontFamily}"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"/>
+                    </StackPanel>
+                    <TextBlock x:Name="YearText"
+                               Foreground="#CCFFFFFF"
+                               FontFamily="{StaticResource YukimoFontFamily}"
+                               FontSize="13"/>
+                    <TextBlock x:Name="EpisodesText"
+                               Foreground="#CCFFFFFF"
+                               FontFamily="{StaticResource YukimoFontFamily}"
+                               FontSize="13"/>
+                </StackPanel>
+
+                <Button x:Name="WatchButton"
+                        Style="{StaticResource YukimoPrimaryButton}"
+                        MinWidth="160"
+                        HorizontalAlignment="Left"
+                        Margin="0,6,0,0">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE768;" FontSize="14"/>
+                        <TextBlock Text="Смотреть"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Border>
+
+</UserControl>

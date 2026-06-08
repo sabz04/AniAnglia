@@ -52,6 +52,7 @@ public partial class App : Application
         services.AddSingleton<ISettingsService, StubSettingsService>();
         services.AddSingleton<IThemeService, ThemeService>();
         services.AddSingleton<INavigationService, NavigationService>();
+        services.AddSingleton<IHomeService, StubHomeService>();
 
         // === Page view-models. Transient — fresh state on each navigation. ===
         services.AddTransient<ShellViewModel>();

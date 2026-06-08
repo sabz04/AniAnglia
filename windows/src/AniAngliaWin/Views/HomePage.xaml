@@ -6,8 +6,106 @@
     xmlns:controls="using:AniAngliaWin.Controls"
     Background="Transparent">
 
-    <controls:PlaceholderPanel
-        Title="{x:Bind ViewModel.Headline, Mode=OneWay}"
-        Subtitle="{x:Bind ViewModel.Sub, Mode=OneWay}"
-        Glyph="&#xE80F;"/>
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled"
+                  Padding="0">
+        <Grid Padding="32,24,32,40" RowSpacing="32">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/> <!-- header -->
+                <RowDefinition Height="Auto"/> <!-- hero -->
+                <RowDefinition Height="Auto"/> <!-- continue watching -->
+                <RowDefinition Height="Auto"/> <!-- recommendations -->
+                <RowDefinition Height="Auto"/> <!-- currently watching -->
+                <RowDefinition Height="Auto"/> <!-- discussing -->
+                <RowDefinition Height="Auto"/> <!-- error banner -->
+            </Grid.RowDefinitions>
+
+            <!-- Header: greeting + (future) avatar -->
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Spacing="2">
+                    <TextBlock Text="{x:Bind ViewModel.Greeting}"
+                               Style="{StaticResource YukimoSubhead}"/>
+                    <TextBlock Text="AniAnglia"
+                               Style="{StaticResource YukimoLargeTitle}"/>
+                </StackPanel>
+                <Button Grid.Column="1"
+                        Style="{StaticResource YukimoGhostButton}"
+                        Click="OnRefreshClick"
+                        ToolTipService.ToolTip="Обновить"
+                        VerticalAlignment="Center">
+                    <FontIcon Glyph="&#xE72C;" FontSize="16"/>
+                </Button>
+            </Grid>
+
+            <!-- HERO -->
+            <Grid Grid.Row="1">
+                <!-- Skeleton (shown while loading) -->
+                <Border Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                        Height="320"
+                        CornerRadius="{ThemeResource YukimoRadiusXl}"
+                        BorderBrush="{ThemeResource YukimoBorderSoftBrush}"
+                        BorderThickness="0.5"
+                        ClipMode="Always">
+                    <controls:Shimmer/>
+                </Border>
+                <!-- Real hero -->
+                <controls:HeroCard
+                    x:Name="HeroCard"
+                    Release="{x:Bind ViewModel.Hero, Mode=OneWay}"
+                    Visibility="{x:Bind ViewModel.IsContentReady, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            </Grid>
+
+            <!-- CONTINUE WATCHING -->
+            <controls:ContinueWatchingRail
+                Grid.Row="2"
+                Header="Продолжить просмотр"
+                ItemsSource="{x:Bind ViewModel.ContinueWatching, Mode=OneWay}"
+                Visibility="{x:Bind ViewModel.IsContentReady, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+            <!-- RECOMMENDATIONS -->
+            <controls:PosterRail
+                Grid.Row="3"
+                Header="Рекомендации"
+                ItemsSource="{x:Bind ViewModel.Recommendations, Mode=OneWay}"
+                Visibility="{x:Bind ViewModel.IsContentReady, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+            <!-- CURRENTLY WATCHING -->
+            <controls:PosterRail
+                Grid.Row="4"
+                Header="Сейчас смотрят"
+                ItemsSource="{x:Bind ViewModel.CurrentlyWatching, Mode=OneWay}"
+                Visibility="{x:Bind ViewModel.IsContentReady, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+            <!-- DISCUSSING -->
+            <controls:PosterRail
+                Grid.Row="5"
+                Header="Обсуждают"
+                ItemsSource="{x:Bind ViewModel.Discussing, Mode=OneWay}"
+                Visibility="{x:Bind ViewModel.IsContentReady, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+            <!-- ERROR BANNER -->
+            <Border Grid.Row="6"
+                    Padding="14"
+                    CornerRadius="{ThemeResource YukimoRadiusMd}"
+                    Background="{ThemeResource YukimoSoftPinkBrush}"
+                    BorderBrush="{ThemeResource YukimoPrimaryCoralBrush}"
+                    BorderThickness="0.5"
+                    Visibility="{x:Bind ViewModel.Error, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}, FallbackValue=Collapsed}">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <FontIcon Glyph="&#xE7BA;"
+                              Foreground="{ThemeResource YukimoPrimaryCoralBrush}"
+                              FontSize="16"/>
+                    <TextBlock Text="{x:Bind ViewModel.Error, Mode=OneWay}"
+                               Style="{StaticResource YukimoFootnote}"
+                               Foreground="{ThemeResource YukimoTextPrimaryBrush}"
+                               TextWrapping="Wrap"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </ScrollViewer>
 </Page>

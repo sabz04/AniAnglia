@@ -4,11 +4,18 @@ WinUI 3 / .NET 8 desktop client. Same product as the iOS app, native
 Windows visuals. See `ARCHITECTURE.md` for the long-form rationale and
 phase plan; this file covers **getting it building**.
 
-## Phase 0 — Bootstrap (the current state)
+## Phase 0 + Phase 2 — current state
+
+Phase 1 (real bridge + auth) is on hold until libanixart has a Windows
+build. The Home page **already runs end-to-end** against an in-memory
+mock dataset (`Services/Stubs/StubHomeService`) — when the bridge lands
+we just swap the DI registration in `App.xaml.cs`.
 
 | What works | What doesn't yet |
 | --- | --- |
-| Mica/Acrylic shell window, coral theme, Light/Dark dictionaries, NavigationView with 5 tabs + Settings, placeholder page per tab, DI container, stub session/settings services persisted to `LocalSettings` | Bridge (Phase 1), Auth (Phase 1), real data (Phase 2+), media playback (Phase 3) |
+| Mica/Acrylic shell; Yukimo coral palette (Light + Dark); NavigationView with 5 tabs + Settings cog; DI container; `LocalSettings`-backed stub session/settings | Bridge (Phase 1), real auth (Phase 1), real API data (Phase 1), media playback (Phase 3) |
+| HomePage with greeting header, hero card, Continue Watching rail, Recommendations / Currently Watching / Discussing rails, shimmer skeletons, error banner, refresh button | Search / Library / Feed / Profile pages still placeholders |
+| `YukimoAsyncImage` async loader with shimmer placeholder; `PosterCard`, `ContinueWatchingCard`, `HeroCard`, `PosterRail`, `ContinueWatchingRail` controls | Click-through into details (Phase 3) |
 
 ## Prerequisites
 
@@ -39,10 +46,16 @@ in Task Manager, not the package name).
 - Title "AniAnglia" in the top-left drag region.
 - Left-side compact NavigationView with five icons: Главная, Поиск,
   Списки, Лента, Профиль (Профиль pinned to the bottom).
-- Selecting any tab loads a placeholder card centred in the content
-  area: coral halo + glyph + "Скоро тут будет контент".
+- **Главная** loads the real Home composition: greeting header, refresh
+  button, shimmer skeletons for ~450 ms, then hero card + four rails
+  (Continue Watching with progress bars + three poster rails).
+- Other tabs still show the placeholder card (coral halo + glyph +
+  "Скоро тут будет контент").
 - The settings cog at the bottom-left works and pushes a placeholder
   Settings page using `DrillInNavigationTransitionInfo`.
+- The hero / poster images come from `picsum.photos` while the bridge
+  is being built — once libanixart is wired in, real Anixart posters
+  appear without any code changes outside `App.xaml.cs`.
 
 If the window opens with **plain solid background** instead of Mica:
 `MicaController.IsSupported()` returned false. That's fine on Win10 —

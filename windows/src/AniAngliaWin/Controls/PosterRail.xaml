@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="AniAngliaWin.Controls.PosterRail"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:AniAngliaWin.Controls"
+    xmlns:models="using:AniAngliaWin.Models">
+
+    <Grid RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0"
+                    Orientation="Horizontal"
+                    Spacing="10"
+                    VerticalAlignment="Center">
+            <TextBlock x:Name="HeaderText"
+                       Style="{StaticResource YukimoTitle3}"/>
+        </StackPanel>
+
+        <!-- Horizontal scroll of the items. ItemsView lets us swap between
+             poster mode and continue-watching mode through the same control. -->
+        <ScrollViewer Grid.Row="1"
+                      HorizontalScrollMode="Auto"
+                      HorizontalScrollBarVisibility="Hidden"
+                      VerticalScrollMode="Disabled"
+                      VerticalScrollBarVisibility="Disabled">
+            <ItemsRepeater x:Name="Items"
+                           HorizontalAlignment="Stretch">
+                <ItemsRepeater.Layout>
+                    <StackLayout Orientation="Horizontal" Spacing="14"/>
+                </ItemsRepeater.Layout>
+                <ItemsRepeater.ItemTemplate>
+                    <DataTemplate x:DataType="models:Release">
+                        <local:PosterCard Release="{x:Bind Mode=OneWay}"/>
+                    </DataTemplate>
+                </ItemsRepeater.ItemTemplate>
+            </ItemsRepeater>
+        </ScrollViewer>
+    </Grid>
+
+</UserControl>
