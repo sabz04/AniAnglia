@@ -14,6 +14,15 @@
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <SelfContained>true</SelfContained>
     <DefaultLanguage>ru-RU</DefaultLanguage>
+    <!--
+      The .NET Framework 4.7.2 XamlCompiler.exe shipped with
+      Microsoft.WindowsAppSDK 1.5.240607001 swallows its own stderr/stdout
+      on CI and surfaces as a bare MSB3073 "exited with code 1". Flipping
+      this flag routes the work to the in-process MSBuild task
+      Microsoft.UI.Xaml.Markup.Compiler.dll (.NET 6+), which logs XAML
+      errors with file + line + diagnostic code as ordinary MSBuild items.
+    -->
+    <UseXamlCompilerExecutable>false</UseXamlCompilerExecutable>
   </PropertyGroup>
 
   <ItemGroup>

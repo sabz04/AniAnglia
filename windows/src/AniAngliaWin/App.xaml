@@ -4,10 +4,15 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="using:AniAngliaWin.Converters">
+    <!--
+        No <XamlControlsResources/> on purpose — that element is a UWP
+        artefact. WinUI 3 loads the default control templates implicitly,
+        and pulling it in via MergedDictionaries can choke the in-process
+        Markup Compiler on certain WindowsAppSDK 1.5 builds.
+    -->
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
                 <ResourceDictionary Source="ms-appx:///Themes/Colors.xaml" />
                 <ResourceDictionary Source="ms-appx:///Themes/Typography.xaml" />
                 <ResourceDictionary Source="ms-appx:///Themes/Tokens.xaml" />

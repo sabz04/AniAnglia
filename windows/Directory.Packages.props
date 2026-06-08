@@ -1,8 +1,12 @@
 <Project>
 
   <ItemGroup>
-    <!-- Platform / WinUI -->
-    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.5.240607001" />
+    <!--
+      Platform / WinUI. 1.5.241001000 is the latest 1.5 servicing build
+      and includes the XamlCompiler diagnostic-routing fix that resolves
+      the silent "exit 1" we hit on the windows-latest runner.
+    -->
+    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.5.241001000" />
     <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.3233" />
 
     <!-- MVVM / DI -->
