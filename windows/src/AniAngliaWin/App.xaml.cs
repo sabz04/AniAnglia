@@ -65,8 +65,9 @@ public partial class App : Application
         return services.BuildServiceProvider();
     }
 
-    private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
+    private void OnUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
+        // Qualified — both Microsoft.UI.Xaml and System expose this type.
         System.Diagnostics.Debug.WriteLine($"[App] UNHANDLED: {e.Exception}");
         // In production: log + offer Restart. For now don't suppress.
     }

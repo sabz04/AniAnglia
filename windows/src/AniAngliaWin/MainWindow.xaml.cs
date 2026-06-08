@@ -18,7 +18,10 @@ namespace AniAngliaWin;
 /// </summary>
 public sealed partial class MainWindow : Window
 {
-    private SystemBackdropController? _backdropController;
+    // Both MicaController and DesktopAcrylicController are IDisposable
+    // but share no public base class — store as IDisposable so the
+    // null-out / Dispose flow works regardless of which one is active.
+    private IDisposable? _backdropController;
     private SystemBackdropConfiguration? _backdropConfig;
 
     public MainWindow()
